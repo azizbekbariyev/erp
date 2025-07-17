@@ -111,13 +111,13 @@ export const ModalStudentForm = ({
           rules={[
             { required: true, message: "Please enter phone number" },
             {
-              pattern: /^(\+998|998)?[0-9]{9}$/,
+              // pattern: /^(\+998|998)?[0-9]{9}$/,
               message:
                 "Please enter a valid phone number format (+998901234567)",
             },
           ]}>
           <MaskedInput
-            mask="+998 00 000 00 00"
+            mask="+998000000000"
             placeholder="Enter phone number"
           />
         </Form.Item>

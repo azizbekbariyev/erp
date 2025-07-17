@@ -1,118 +1,80 @@
-import { Controller, useForm } from "react-hook-form"
-import type { TeacherTypes } from "../../types"
-import { Form, Input, Modal, Select } from "antd"
+import { Button, Modal, Table, Typography } from "antd";
+import type { GroupTypes, TeacherTypes } from "../../types";
+import { useForm } from "react-hook-form";
+import { useGroup, useTeacher } from "../../hooks";
+import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
 
 interface Props {
-    open: boolean
-    onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
-const GroupTeacherModal = ({open, onClose}:Props) => {
-    const {control, handleSubmit, formState:{errors}} = useForm<TeacherTypes>()
-    const onSubmit = (data:TeacherTypes) => {
-        console.log(data);
+const GroupTeacherModal = ({ open, onClose }: Props) => {
+  const { id } = useParams(); 
+  const groupId = Number(id);
+  const { reset } = useForm<TeacherTypes>();
+  const { data: teachers } = useTeacher();
+  const { useGroupUpdate, useGroupById } = useGroup();
+  const { mutate } = useGroupUpdate();
+  const { data: group } = useGroupById(Number(id));
+
+  const onSubmit = (record: TeacherTypes) => {
+    if (!group?.data) return;
+    mutate({ groupId, teacherId: record.id });
+    reset();
+    onClose();
+  };
+
+  const columns = [
+    {
+      title: "First Name",
+      dataIndex: "first_name",
+    },
+    {
+      title: "Last Name",
+      dataIndex: "last_name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+    },
+    {
+      title: "Actions",
+      render: (_: any, record: TeacherTypes) => (
+        <Button type="primary" onClick={() => onSubmit(record)}>
+          Add
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <Modal
+      open={open}
+      onCancel={() => {
+        reset();
         onClose();
-    }
-    return (
-        <Modal
-        onOk={handleSubmit(onSubmit)}
-        open={open}
-        onCancel={onClose}
-        title="Add Teacher">
-            <Form layout="vertical">
-                <Form.Item
-                label="First Name"
-                validateStatus={errors.first_name ? "error" : ""}
-                >
-                <Controller
-                    name="first_name"
-                    control={control}
-                    rules={{ required: "First Name is required" }}
-                    render={({ field }) => (
-                    <Input placeholder="First Name" {...field} />
-                    )}
-                />
-                </Form.Item>
+      }}
+      title="Add Teacher"
+      width={800}
+      footer={null}
+      destroyOnClose
+    >
+      <Typography.Title level={5}>📋 Existing Teachers</Typography.Title>
+      <Table
+        dataSource={teachers?.data.teachers ?? []}
+        columns={columns}
+        rowKey="id"
+        pagination={false}
+        size="small"
+      />
+    </Modal>
+  );
+};
 
-                <Form.Item
-                label="Last Name"
-                validateStatus={errors.last_name ? "error" : ""}
-                >
-                <Controller
-                    name="last_name"
-                    control={control}
-                    rules={{ required: "Last Name is required" }}
-                    render={({ field }) => (
-                    <Input placeholder="Last Name" {...field} />
-                    )}
-                />
-                </Form.Item>
-
-                <Form.Item
-                label="Email"
-                validateStatus={errors.email ? "error" : ""}
-                >
-                <Controller
-                    name="email"
-                    control={control}
-                    rules={{ required: "Email is required" }}
-                    render={({ field }) => (
-                    <Input placeholder="Email" {...field} />
-                    )}
-                />
-                </Form.Item>
-
-                <Form.Item
-                label="Phone"
-                validateStatus={errors.phone ? "error" : ""}
-                >
-                <Controller
-                    name="phone"
-                    control={control}
-                    rules={{ required: "Phone is required" }}
-                    render={({ field }) => (
-                    <Input placeholder="Phone" {...field} />
-                    )}
-                />
-                </Form.Item>
-
-                <Form.Item
-                label="Role"
-                validateStatus={errors.role ? "error" : ""}
-                >
-                <Controller
-                    name="role"
-                    control={control}
-                    rules={{ required: "Role is required" }}
-                    render={({ field }) => (
-                    <Input placeholder="Role" {...field} />
-                    )}
-                />
-                </Form.Item>
-
-                <Form.Item
-                label="Active"
-                validateStatus={errors.is_active ? "error" : ""}
-                >
-                <Controller
-                    name="is_active"
-                    control={control}
-                    rules={{ required: "Status is required" }}
-                    render={({ field }) => (
-                        <Select
-                        placeholder="Status"
-                        {...field}
-                        options={[
-                            { value: true, label: "Active" },
-                            { value: false, label: "Inactive" },
-                        ]}
-                        />
-                    )}
-                />
-                </Form.Item>
-            </Form>
-        </Modal>
-    )
-}
-
-export default GroupTeacherModal
+export default GroupTeacherModal;

@@ -8,7 +8,6 @@ export const useStudent = () => {
     queryKey: ["students"],
     queryFn: async () => {
       const response = await StudentSerivce.getAllStudent();
-      console.log("useStudent API javobi: Hooks", response.data.students); // API javobini tekshirish
       return response;
     },
   });
@@ -41,7 +40,7 @@ export const useStudent = () => {
       queryKey: ["student", id],
       queryFn: async () => StudentSerivce.getStudentById(id),
     });
-  }
+  };
   return {
     data,
     isLoading,

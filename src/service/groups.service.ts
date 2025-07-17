@@ -13,7 +13,7 @@ export const GroupService = {
   },
 
   updateGroup(id: number, model: GroupTypes) {
-    return apiConfig().putRequest(`${ApiUrls.GROUPS}/${id}`,model); // yoki putRequest ishlatish mumkin
+    return apiConfig().putRequest(`${ApiUrls.GROUPS}/${id}`,model);
   },
 
   deleteGroup(id: number) {
@@ -22,5 +22,21 @@ export const GroupService = {
 
   getGroupById(id: number) {
     return apiConfig().getRequest(`${ApiUrls.GROUPS}/${id}`);
-  }
+  },
+
+  addStudentToGroup(groupId: number, studentId: number) {
+    return apiConfig().putRequest(`${ApiUrls.GROUPS}/${groupId}/add-student/${studentId}`);
+  },
+
+  removeStudentFromGroup(groupId: number, studentId: number) {
+    return apiConfig().putRequest(`${ApiUrls.GROUPS}/${groupId}/remove-student/${studentId}`);
+  },
+
+  addTeacherToGroup(groupId: number, teacherId: number) {
+    return apiConfig().putRequest(`${ApiUrls.GROUPS}/${groupId}/add-teacher/${teacherId}`);
+  },
+
+  removeTeacherFromGroup(groupId: number, teacherId: number) {
+    return apiConfig().putRequest(`${ApiUrls.GROUPS}/${groupId}/remove-teacher/${teacherId}`);
+  },
 };

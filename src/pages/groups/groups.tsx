@@ -65,7 +65,7 @@ export const Groups = () => {
   };
 
   const handleDelete = (record: GroupTypes) => {
-    deleteGroup(record.id, {
+    deleteGroup(record.id!, {
       onSuccess: () => {
         message.success("Group deleted successfully");
       },

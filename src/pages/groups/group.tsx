@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useGroup } from "@hooks";
 import { Button, Popconfirm, Space, Table } from "antd";
 import type { StudentTypes } from "../../types";
-import { EditOutlined } from "@ant-design/icons";
 import GroupStudentModal from "./groupStudent";
 import { useState } from "react";
 import GroupTeacherModal from "./groupTeacher";
@@ -12,18 +11,15 @@ const Group = () => {
   const [openStudent, setStudentOpen] = useState(false);
   const [openTeacher, setTeacherOpen] = useState(false);
   const { useGroupById, useGroupDelete } = useGroup();
-  const { data: group, isLoading } = useGroupById(id);
+  const { data: group, isLoading, refetch } = useGroupById(id);
   const { mutate: deleteGroup } = useGroupDelete();
 
   if (isLoading) return <p>Loading...</p>;
   if (!group) return <p>Group not found</p>;
 
-  const handleUpdate = (record: StudentTypes) => {
-    console.log(record);
-  };
-
   const handleDelete = (record: StudentTypes) => {
     deleteGroup(record.id);
+    refetch();
   };
 
   const columsTeacher = [
@@ -51,10 +47,6 @@ const Group = () => {
       title: "Actions",
       render: (_: any, record: StudentTypes) => (
         <Space>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleUpdate(record)}
-          />
           <Popconfirm
             title="Are you sure you want to delete this group?"
             onConfirm={() => handleDelete(record)}
@@ -93,10 +85,6 @@ const Group = () => {
       title: "Actions",
       render: (_: any, record: StudentTypes) => (
         <Space>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleUpdate(record)}
-          />
           <Popconfirm
             title="Are you sure you want to delete this group?"
             onConfirm={() => handleDelete(record)}
@@ -142,6 +130,7 @@ const Group = () => {
         <GroupStudentModal
           open={openStudent}
           onClose={() => setStudentOpen(false)}
+          refetch={refetch}
         />
         <ul className="list-disc pl-6">
           <Table

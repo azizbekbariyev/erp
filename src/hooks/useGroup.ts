@@ -38,7 +38,20 @@ export const useGroup = (params: ParamsType) => {
     return useQuery({
       queryKey: ["group", id],
       queryFn: async () => GroupService.getGroupById(id),
+      enabled: !!id
     });
+  }
+
+  const useGroupAddStudent = () => {
+    return useMutation({
+      mutationFn: async ({groupId, studentId}: {groupId: number; studentId: number}) => GroupService.addStudentToGroup(groupId, studentId),
+    })
+  }
+
+  const useGroupAddTeacher = () => {
+    return useMutation({
+      mutationFn: async ({groupId, teacherId}: {groupId: number; teacherId: number}) => GroupService.addTeacherToGroup(groupId, teacherId),
+    })
   }
 
   return {
@@ -47,6 +60,7 @@ export const useGroup = (params: ParamsType) => {
     useGroupUpdate,
     useGroupDelete,
     useGroupById,
+    useGroupAddStudent,
   };
 };
   

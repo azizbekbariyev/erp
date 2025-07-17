@@ -1,90 +1,83 @@
-import { Form, Input, Modal } from "antd";
-import { useForm, Controller } from "react-hook-form";
-import type { StudentTypes } from "../../types";
+import { Button, Modal, Table, Typography } from "antd";
+import { useForm } from "react-hook-form";
+import type { GroupTypes, StudentTypes } from "../../types";
+import { useGroup, useStudent } from "../../hooks";
+import { useParams } from "react-router-dom";
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  refetch: () => void;
 }
 
-const GroupStudentModal = ({ open, onClose }: Props) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<StudentTypes>();
+const GroupStudentModal = ({ open, onClose, refetch }: Props) => {
+  const { id } = useParams();
+  const groupId = Number(id);
+  const { reset } = useForm<StudentTypes>();
+  const { data: students, isLoading } = useStudent();
+  const { useGroupAddStudent, useGroupById } = useGroup();
+  const { mutate } = useGroupAddStudent();
+  const { data: group } = useGroupById(Number(id));
 
-  const onSubmit = (data: StudentTypes) => {
-    console.log("Form data:", data);
+  const onSubmit = (record: StudentTypes) => {
+    if (!group?.data) return;
+    mutate({
+      groupId,
+      studentId: record.id,
+    });
+    reset();
+    refetch();
     onClose();
   };
 
+  const columns = [
+    {
+      title: "First Name",
+      dataIndex: "first_name",
+    },
+    {
+      title: "Last Name",
+      dataIndex: "last_name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+    },
+    {
+      title: "Actions",
+      render: (_: any, record: StudentTypes) => (
+        <Button type="primary" onClick={() => onSubmit(record)}>
+          Add
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <Modal
-      onOk={handleSubmit(onSubmit)}
       open={open}
-      onCancel={onClose}
+      onCancel={() => {
+        reset();
+        onClose();
+      }}
       title="Add Student"
+      width={800}
+      footer={null}
+      destroyOnClose
     >
-      <Form layout="vertical">
-        <Form.Item
-          label="First Name"
-          validateStatus={errors.first_name ? "error" : ""}
-        >
-          <Controller
-            name="first_name"
-            control={control}
-            rules={{ required: "First Name is required" }}
-            render={({ field }) => (
-              <Input placeholder="First Name" {...field} />
-            )}
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Last Name"
-          validateStatus={errors.last_name ? "error" : ""}
-        >
-          <Controller
-            name="last_name"
-            control={control}
-            rules={{ required: "Last Name is required" }}
-            render={({ field }) => <Input placeholder="Last Name" {...field} />}
-          />
-        </Form.Item>
-
-        <Form.Item label="Email" validateStatus={errors.email ? "error" : ""}>
-          <Controller
-            name="email"
-            control={control}
-            rules={{ required: "Email is required" }}
-            render={({ field }) => <Input placeholder="Email" {...field} />}
-          />
-        </Form.Item>
-
-        <Form.Item label="Phone" validateStatus={errors.phone ? "error" : ""}>
-          <Controller
-            name="phone"
-            control={control}
-            rules={{ required: "Phone is required" }}
-            render={({ field }) => <Input placeholder="Phone" {...field} />}
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Date of Birth"
-          validateStatus={errors.date_of_birth ? "error" : ""}
-        >
-          <Controller
-            name="date_of_birth"
-            control={control}
-            rules={{ required: "Date of birth is required" }}
-            render={({ field }) => (
-              <Input placeholder="YYYY-MM-DD" {...field} />
-            )}
-          />
-        </Form.Item>
-      </Form>
+      <Typography.Title level={5}>📋 Existing Students</Typography.Title>
+      <Table
+        dataSource={students?.data.students ?? []}
+        columns={columns}
+        rowKey="id"
+        pagination={false}
+        loading={isLoading}
+        size="small"
+      />
     </Modal>
   );
 };

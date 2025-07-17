@@ -1,5 +1,5 @@
 export interface GroupTypes {
-  id: number;
+  id?: number;
   name: string;
   course_id: number;
   teacherId: number[];

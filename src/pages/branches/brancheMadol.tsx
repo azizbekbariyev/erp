@@ -95,7 +95,7 @@ export const BranchModal: React.FC<BranchModalProps> = ({
             },
           ]}>
           <MaskedInput
-            mask="+998 00 000 00 00"
+            mask="+998000000000"
             placeholder="Enter phone number"
           />
         </Form.Item>

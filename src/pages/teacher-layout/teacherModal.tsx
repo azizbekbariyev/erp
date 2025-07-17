@@ -98,7 +98,8 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
       confirmLoading={loading}
       okText={teacher ? "Saqlash" : "Yaratish"}
       cancelText="Bekor qilish"
-      width={600}>
+      width={600}
+    >
       <Form
         form={form}
         layout="vertical"
@@ -110,7 +111,8 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
           phone: "",
           role: "teacher",
           branchId: [],
-        }}>
+        }}
+      >
         <Form.Item
           name="first_name"
           label="Ism"
@@ -124,7 +126,8 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
               max: 50,
               message: "Ism 50 ta belgidan oshmasligi kerak!",
             },
-          ]}>
+          ]}
+        >
           <Input placeholder="Ismni kiriting" />
         </Form.Item>
 
@@ -141,7 +144,8 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
               max: 50,
               message: "Familiya 50 ta belgidan oshmasligi kerak!",
             },
-          ]}>
+          ]}
+        >
           <Input placeholder="Familiyani kiriting" />
         </Form.Item>
 
@@ -154,7 +158,8 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
               type: "email",
               message: "To'g'ri email formatini kiriting!",
             },
-          ]}>
+          ]}
+        >
           <Input placeholder="email@example.com" />
         </Form.Item>
 
@@ -178,7 +183,8 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
                       "Parol kamida 6 ta belgidan iborat bo'lishi kerak!",
                   },
                 ]
-          }>
+          }
+        >
           <Input.Password
             placeholder={
               teacher ? "Yangi parol (ixtiyoriy)" : "Parolni kiriting"
@@ -200,17 +206,16 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
               message:
                 "Telefon raqami kamida 9 ta raqamdan iborat bo'lishi kerak!",
             },
-          ]}>
-          <MaskedInput
-            mask="+998 00 000 00 00"
-            placeholder="Enter phone number"
-          />
+          ]}
+        >
+          <MaskedInput mask="+998000000000" placeholder="Enter phone number" />
         </Form.Item>
 
         <Form.Item
           name="role"
           label="Rol"
-          rules={[{ required: true, message: "Rol tanlanishi shart!" }]}>
+          rules={[{ required: true, message: "Rol tanlanishi shart!" }]}
+        >
           <Select placeholder="Rolni tanlang">
             {roles.map((role: any) => (
               <Option key={role.value} value={role.value}>
@@ -223,12 +228,14 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
         <Form.Item
           name="branchId"
           label="Filial"
-          rules={[{ required: true, message: "Filial tanlanishi shart!" }]}>
+          rules={[{ required: true, message: "Filial tanlanishi shart!" }]}
+        >
           <Select
             mode="multiple"
             placeholder="Filiallarni tanlang"
             loading={!branchData}
-            allowClear>
+            allowClear
+          >
             {Array.isArray(branches) &&
               branches.map((branch: any) => (
                 <Option key={branch.id} value={branch.id}>
