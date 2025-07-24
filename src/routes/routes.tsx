@@ -2,7 +2,7 @@ import {Route, RouterProvider, createBrowserRouter, createRoutesFromElements } f
 import App from '../App';
 import { SignUp,SignIn, Admin, StudentLayout, Teacher, NotFound, Courses, LoginProtect, LayoutProtect, Worker, Branches } from '@pages';
 import { Groups } from '@pages';
-import {Group} from '@pages';
+import SingleGroup from '../pages/groups/single-group';
 const Router = () => {
     const router = createBrowserRouter(
       createRoutesFromElements(
@@ -26,7 +26,7 @@ const Router = () => {
               </LayoutProtect>
             }>
             <Route index element={<Groups />} />,
-            <Route path="group/:id" element={<Group />} />
+            <Route path="group/:id" element={<SingleGroup />} />
             <Route path="students" element={<StudentLayout />} />,
             <Route path="branches" element={<Branches />} />,
             <Route path="courses" element={<Courses />}></Route>

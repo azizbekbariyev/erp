@@ -4,8 +4,23 @@ import { ApiUrls } from "@api/api-urls";
 import type { GroupTypes } from "@types";
 import type { ParamsType } from "@types";
 export const GroupService = {
-  fetchGroups(params:ParamsType) {
-    return apiConfig().getRequest(ApiUrls.GROUPS, params);
+  async fetchGroups(params: ParamsType) {
+    return await apiConfig().getRequest(ApiUrls.GROUPS, params);
+  },
+  
+  async getGroupLessons(groupId: number) {
+    const res = await apiConfig().getRequest(`${ApiUrls.GROUPLESSONS}/${groupId}`);
+    return res
+  },
+
+  async getGroupStudents(groupId: number) {
+    const res = await apiConfig().getRequest(`${ApiUrls.GROUPSTUDENTSBYGROUPID}/${groupId}`);
+    return res
+  },
+
+  async getGroupTeachers(groupId: number) {
+    const res = await apiConfig().getRequest(`${ApiUrls.GROUPTEACHERSBYGROUPID}/${groupId}`);
+    return res
   },
 
   createGroup(model: GroupTypes) {
@@ -39,4 +54,6 @@ export const GroupService = {
   removeTeacherFromGroup(groupId: number, teacherId: number) {
     return apiConfig().putRequest(`${ApiUrls.GROUPS}/${groupId}/remove-teacher/${teacherId}`);
   },
+
+
 };
