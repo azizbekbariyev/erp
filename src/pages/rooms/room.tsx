@@ -43,7 +43,7 @@ const Room = () => {
     limit: 10,
   });
   const { mutate: deleteMutation, isPending: isDeleting } = deleteRoom();
-  const { mutate: createMutation, isPending: isCreating } = createRoom();
+  const { mutate: createMutation } = createRoom();
   const { mutate: updateMutation, isPending: isUpdating } = updateRoom();
 
   const handleCreate = () => {

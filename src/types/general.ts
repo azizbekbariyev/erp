@@ -12,6 +12,10 @@ export interface PaginationConfig {
   setParams: (params: ParamsType) => void;
 }
 
+export interface ProtectedRoute {
+  children: ReactNode;
+}
+
 export interface ParamsType {
   page: number;
   limit: number;

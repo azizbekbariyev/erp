@@ -1,13 +1,10 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useGroup } from '../../hooks';
-import GroupTeachers from '../../components/group/teachers';
 import GroupLessons from '../../components/group/lessons';
-import GroupStudents from '../../components/group/students';
 
 const SingleGroup = () => {
   const { id } = useParams<{ id: string }>();
-  const { students, lessons, teachers } = useGroup({ page: 1, limit: 10 }, Number(id));
+  const { lessons } = useGroup({ page: 1, limit: 10 }, Number(id));
 
   console.log("LESSONS DATA:", lessons?.data?.lessons); // Tashqarida console.log
 

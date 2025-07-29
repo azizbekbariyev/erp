@@ -1,7 +1,7 @@
 import { GetItem } from '../../helper/storages'
 import { Navigate } from 'react-router-dom'
-import type { ProtectRoute } from '../../types'
-export const LoginProtect = ({children}:ProtectRoute) => {
+import type { ProtectedRoute } from '../../types'
+export const LoginProtect = ({children}:ProtectedRoute) => {
     const token  = GetItem("access_token")
     const role = GetItem("role")
     if(token){

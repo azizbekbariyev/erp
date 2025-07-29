@@ -1,6 +1,6 @@
 import { Button, Modal, Table, Typography } from "antd";
 import { useForm } from "react-hook-form";
-import type { GroupTypes, StudentTypes } from "../../types";
+import type { StudentTypes } from "../../types";
 import { useGroup, useStudent } from "../../hooks";
 import { useParams } from "react-router-dom";
 

@@ -18,13 +18,13 @@ const Groups = () => {
   const { data: courses } = useCourse({ limit: 100, page: 1 });
   const {mutate: deleteMutation, isPending: isDeletePending} = useGroupDelete();
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState(null);
+  // const [selectedGroup, setSelectedGroup] = useState(null);
   const [update, setUpdate] = useState<GroupTypes | null>(null);
 
   const createGroup = useGroupCreate();
 
   const handleOpenModal = () => {
-    setSelectedGroup(null);
+    setUpdate(null);
     setModalOpen(true);
   };
 
@@ -96,7 +96,7 @@ const editItem = (record: GroupTypes) => {
         onSubmit={handleSubmit}
         loading={createGroup.isPending}
         courses={courses?.data?.data || []}
-        initialValues={selectedGroup}
+        initialValues={update}
       />
     </>
   );

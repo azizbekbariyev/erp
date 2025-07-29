@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button } from 'antd'
 import { useWorker } from '../../hooks/useWorker'
 export const Worker = () => {

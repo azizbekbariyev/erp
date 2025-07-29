@@ -1,9 +1,8 @@
 import { Button, Modal, Table, Typography } from "antd";
-import type { GroupTypes, TeacherTypes } from "../../types";
+import type { TeacherTypes } from "../../types";
 import { useForm } from "react-hook-form";
 import { useGroup, useTeacher } from "../../hooks";
 import { useParams } from "react-router-dom";
-import dayjs from "dayjs";
 
 interface Props {
   open: boolean;
@@ -12,16 +11,23 @@ interface Props {
 
 const GroupTeacherModal = ({ open, onClose }: Props) => {
   const { id } = useParams(); 
-  const groupId = Number(id);
+  // const groupId = Number(id);
   const { reset } = useForm<TeacherTypes>();
-  const { data: teachers } = useTeacher();
-  const { useGroupUpdate, useGroupById } = useGroup();
-  const { mutate } = useGroupUpdate();
+  const { data: teachers } = useTeacher({
+    page: 1,
+    limit: 10,
+  });
+  const { useGroupById } = useGroup({
+    page: 1,
+    limit: 10,
+  });
+  // const { mutate } = useGroupUpdate();
   const { data: group } = useGroupById(Number(id));
 
   const onSubmit = (record: TeacherTypes) => {
     if (!group?.data) return;
-    mutate({ groupId, teacherId: record.id });
+    // mutate({ groupId, teacherId: record.id });
+    console.log(record);
     reset();
     onClose();
   };

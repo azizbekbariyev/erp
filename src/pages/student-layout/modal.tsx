@@ -1,9 +1,7 @@
 import { useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker, Switch } from "antd";
-import type { LidTypes, RoomTypes, StudentTypes } from "../../types";
+import { Modal, Form, Input, Select, DatePicker } from "antd";
+import type { StudentTypes } from "../../types";
 import dayjs from "dayjs";
-import { useLid } from "../../hooks/useLid";
-import { useRoom } from "../../hooks/useRoom";
 
 type Props = {
   open: boolean;
