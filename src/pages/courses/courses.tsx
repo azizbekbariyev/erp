@@ -9,19 +9,16 @@ import CourseModal from "./courseModal";
 
 const Course = () => {
   const [params, setParams] = useState({ page: 1, limit: 10 });
-  const {
-    data,
-    isLoading,
-    createCourse,
-    updateCourse,
-    deleteCourse,
-  } = useCourse(params);
+  const { data, isLoading, createCourse, updateCourse, deleteCourse } =
+    useCourse(params);
   const { mutate: createMutation } = createCourse();
   const { mutate: updateMutation, isPending: isUpdating } = updateCourse();
   const { mutate: deleteMutation, isPending: isDeleting } = deleteCourse();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(
+    null
+  );
   const location = useLocation();
   const { handlePagination } = useGeneral();
 
@@ -66,9 +63,21 @@ const Course = () => {
     { title: "Description", dataIndex: "description", key: "description" },
     { title: "Price", dataIndex: "price", key: "price" },
     { title: "Duration", dataIndex: "duration", key: "duration" },
-    { title: "Lessons in a week", dataIndex: "lessons_in_a_week", key: "lessons_in_a_week" },
-    { title: "Lessons in a month", dataIndex: "lessons_in_a_month", key: "lessons_in_a_month" },
-    { title: "Lesson duration", dataIndex: "lesson_duration", key: "lesson_duration" },
+    {
+      title: "Lessons in a week",
+      dataIndex: "lessons_in_a_week",
+      key: "lessons_in_a_week",
+    },
+    {
+      title: "Lessons in a month",
+      dataIndex: "lessons_in_a_month",
+      key: "lessons_in_a_month",
+    },
+    {
+      title: "Lesson duration",
+      dataIndex: "lesson_duration",
+      key: "lesson_duration",
+    },
     {
       title: "Status",
       dataIndex: "is_active",
@@ -97,12 +106,16 @@ const Course = () => {
 
   return (
     <div>
-      <Button type="primary" onClick={handleCreate} style={{ marginBottom: 16 }}>
+      <Button
+        type="primary"
+        onClick={handleCreate}
+        style={{ marginBottom: 16 }}
+      >
         + Add Course
       </Button>
 
       <Table
-        dataSource={data}
+        dataSource={data || []}
         columns={columns}
         rowKey="id"
         loading={isLoading}
@@ -125,7 +138,6 @@ const Course = () => {
         onCancel={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
         initialValues={selectedCourse}
-        
       />
     </div>
   );
