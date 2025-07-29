@@ -11,8 +11,8 @@ export const EventService = {
         return apiConfig().postRequest(ApiUrls.EVENTS, model)
     },
 
-    updateEvent(model: EventTypes, id: number){
-        return apiConfig().putRequest(`${ApiUrls.EVENTS}/${id}`, model)
+    updateEvent(model: EventTypes){
+        return apiConfig().putRequest(`${ApiUrls.EVENTS}/${model.id}`, model)
     },
 
     deleteEvent(id: number){
