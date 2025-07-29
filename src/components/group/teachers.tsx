@@ -1,4 +1,3 @@
-import React from 'react'
 import type { GroupTeachersType } from '../../types'
 
 const GroupTeachers = ({teachers}:GroupTeachersType) => {

@@ -3,7 +3,6 @@ import {
   Table,
   Button,
   Space,
-  Popconfirm,
   Input,
   Card,
   Row,
@@ -12,18 +11,19 @@ import {
 } from "antd";
 import { SearchOutlined, ClearOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { useBranch } from "@hooks";
-import type { BranchesTypes } from "@types";
+import type { BranchTypes } from "@types";
 import { BranchModal } from "./brancheMadol";
+import { PopConfirm } from "../../components";
 
 const { Search } = Input;
 
 export const Branches = () => {
-  const [branches, setBranches] = useState<BranchesTypes[]>([]);
-  const [filteredBranches, setFilteredBranches] = useState<BranchesTypes[]>([]);
+  const [branches, setBranches] = useState<BranchTypes[]>([]);
+  const [filteredBranches, setFilteredBranches] = useState<BranchTypes[]>([]);
   const [searchText, setSearchText] = useState("");
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<BranchesTypes | null>(
+  const [selectedBranch, setSelectedBranch] = useState<BranchTypes | null>(
     null
   );
 
@@ -35,9 +35,9 @@ export const Branches = () => {
   } = useBranch();
 
   // Mutation hooks
-  const createMutation = useBranchCreate();
-  const updateMutation = useBranchUpdate();
-  const deleteMutation = useBranchDelete();
+  const {mutate:createMutation, isPending: isCreatePending} = useBranchCreate();
+  const {mutate:updateMutation, isPending: isUpdatePending} = useBranchUpdate();
+  const {mutate:deleteMutation, isPending: isDeletePending} = useBranchDelete();
 
   useEffect(() => {
     console.log("Branch data received:", branchData);
@@ -78,7 +78,7 @@ export const Branches = () => {
   }, [branches, searchText]);
 
   const handleDelete = (branch: any) => {
-    deleteMutation.mutate(branch.id, {
+    deleteMutation(branch.id, {
       onSuccess: () => {
         message.success("Branch deleted successfully");
         setBranches((prev) => prev.filter((b: any) => b.id !== branch.id));
@@ -107,7 +107,7 @@ export const Branches = () => {
 
   const handleModalSubmit = (values: any) => {
     if (selectedBranch) {
-      updateMutation.mutate(
+      updateMutation(
         { id: (selectedBranch as any).id, data: values },
         {
           onSuccess: (response) => {
@@ -137,7 +137,7 @@ export const Branches = () => {
         }
       );
     } else {
-      createMutation.mutate(values, {
+      createMutation(values, {
         onSuccess: (response) => {
           message.success("New branch created successfully");
           console.log("Create response:", response);
@@ -198,18 +198,16 @@ export const Branches = () => {
     },
     {
       title: "Actions",
-      render: (_: any, record: BranchesTypes) => (
+      render: (_: any, record: BranchTypes) => (
         <Space>
           <Button
+            type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
           />
-          <Popconfirm
-            title="Are you sure you want to delete this group?"
-            onConfirm={() => handleDelete(record)}
-          >
-            <Button className="w-[20%]">🗑</Button>
-          </Popconfirm>
+          <PopConfirm
+            handleDelete={() => handleDelete(record)} 
+            loading={isDeletePending}/>
         </Space>
       ),
     },
@@ -292,7 +290,7 @@ export const Branches = () => {
         onCancel={handleModalCancel}
         onSubmit={handleModalSubmit}
         branch={selectedBranch}
-        loading={createMutation.isPending || updateMutation.isPending}
+        loading={isCreatePending || isUpdatePending}
       />
     </div>
   );

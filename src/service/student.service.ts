@@ -1,10 +1,10 @@
 import { apiConfig } from "@api/config"
 import { ApiUrls } from "@api/api-urls"
-import type { StudentTypes } from "@types"
+import type { ParamsType, StudentTypes } from "@types"
 
 export const StudentSerivce = {
-    getAllStudent(){
-        return apiConfig().getRequest(ApiUrls.STUDENTS)
+    getAllStudent(params:ParamsType){
+        return apiConfig().getRequest(ApiUrls.STUDENTS, params)
     },
     createStudent(model:StudentTypes){
         return apiConfig().postRequest(ApiUrls.STUDENTS, model)

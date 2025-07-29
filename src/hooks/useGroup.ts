@@ -8,7 +8,7 @@ export const useGroup = (params: ParamsType, id?: number) => {
   const { data , refetch } = useQuery({
     enabled: !id,
     queryKey: ["groups", params],
-    queryFn: async () => GroupService.fetchGroups(params),
+    queryFn: async () => await GroupService.fetchGroups(params),
   });
 
   const useGroupCreate = () => {

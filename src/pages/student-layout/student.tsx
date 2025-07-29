@@ -1,107 +1,73 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Space,
-  Popconfirm,
-  Input,
-  Select,
-  Row,
-  Col,
-  Card,
-} from "antd";
-import { SearchOutlined, ClearOutlined, EditOutlined } from "@ant-design/icons";
-import type { StudentTypes } from "@types";
-import { ModalStudentForm } from "./modal";
-import { useStudent } from "@hooks";
+import { useStudent } from "../../hooks";
+import { Table, Button, Space } from "antd";
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import type { StudentTypes } from "../../types";
+import { PopConfirm } from "../../components";
+import StudentModal from "./modal";
 
-const { Search } = Input;
-const { Option } = Select;
-
-export const Students = () => {
+const Students = () => {
   const [students, setStudents] = useState<StudentTypes[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<StudentTypes[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingStudent, setEditingStudent] = useState<StudentTypes | null>(
-    null
-  );
+  const [update, setUpdate] = useState<StudentTypes | null>(null);
 
-  const [searchText, setSearchText] = useState("");
-  const [selectedGender, setSelectedGender] = useState<string | null>(null);
-  const [selectedActive, setSelectedActive] = useState<boolean | null>(null);
+  const { data, useStudentCreate, useStudentDelete, useStudentUpdate } = useStudent({
+    page: 1,
+    limit: 10,
+  });
 
-  const {
-    data: studentData,
-    isLoading,
-    error,
-    useStudentDelete,
-  } = useStudent();
-  const deleteMutation = useStudentDelete();
+  const { mutate: createMutation, isPending: isCreating } = useStudentCreate();
+  const { mutate: deleteMutation, isPending: isDeleting } = useStudentDelete();
+  const { mutate: updateMutation, isPending: isUpdating } = useStudentUpdate();
 
   useEffect(() => {
-    if (studentData?.data?.students) {
-      setStudents(studentData.data.students);
+    if (data?.data.data && Array.isArray(data.data.data)) {
+      setStudents(data.data.data as StudentTypes[]);
     } else {
       setStudents([]);
     }
-  }, [studentData]);
+  }, [data]);
 
-  // Filteringz
-  useEffect(() => {
-    let filtered = [...students];
+  const handleOpenModal = () => {
+    setUpdate(null);
+    setModalOpen(true);
+  };
 
-    if (searchText) {
-      filtered = filtered.filter((student) =>
-        `${student.first_name} ${student.last_name}`
-          .toLowerCase()
-          .includes(searchText.toLowerCase())
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setUpdate(null);
+  };
+
+  const handleUpdate = (record: StudentTypes) => {
+    setUpdate(record);
+    setModalOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    deleteMutation(id);
+  };
+
+  const handleSubmit = (values: any) => {
+    if (update) {
+      console.log("Update",values);
+      updateMutation(
+        { id: update.id, data: values },
+        {
+          onSuccess: () => {
+            handleCloseModal();
+          },  
+        }
       );
-    }
-
-    if (selectedGender) {
-      filtered = filtered.filter(
-        (student) => student.gender === selectedGender
-      );
-    }
-
-    if (selectedActive !== null) {
-      filtered = filtered.filter((student) => student.is_active);
-    }
-
-    setFilteredStudents(filtered);
-  }, [students, searchText, selectedGender, selectedActive]);
-
-  // Delete
-  const handleDelete = (student: StudentTypes) => {
-    deleteMutation.mutate(
-      { id: student.id },
-      {
+    } else {
+      console.log("Create",values);
+      createMutation(values, {
         onSuccess: () => {
-          console.log("Student deleted:", student.id);
-          setStudents((prev) => prev.filter((s) => s.id !== student.id));
+          handleCloseModal();
         },
-      }
-    );
+      });
+    }
   };
 
-  // Create / Edit
-  const handleUpdate = (student: StudentTypes) => {
-    setEditingStudent(student);
-    setModalOpen(true);
-  };
-
-  const handleCreate = () => {
-    setEditingStudent(null);
-    setModalOpen(true);
-  };
-
-  const clearAllFilters = () => {
-    setSearchText("");
-    setSelectedGender(null);
-    setSelectedActive(null);
-  };
-
-  // Table columns
   const columns = [
     {
       title: "ID",
@@ -130,12 +96,14 @@ export const Students = () => {
     {
       title: "Gender",
       dataIndex: "gender",
-      render: (gender: string) => (gender === "male" ? "Male" : "Female"),
+      render: (gender: string) =>
+        gender === "male" ? "Male" : gender === "female" ? "Female" : "-",
     },
     {
       title: "Date of Birth",
       dataIndex: "date_of_birth",
-      render: (date: string) => new Date(date).toLocaleDateString("en-US"),
+      render: (date: string) =>
+        date ? new Date(date).toLocaleDateString("en-US") : "-",
     },
     {
       title: "Status",
@@ -152,112 +120,49 @@ export const Students = () => {
       render: (_: any, record: StudentTypes) => (
         <Space>
           <Button
+          type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
+            disabled={isUpdating}
           />
-          <Popconfirm
-            title="Are you sure you want to delete this group?"
-            onConfirm={() => handleDelete(record)}
-          >
-            <Button className="w-[20%]">🗑</Button>
-          </Popconfirm>
+          <PopConfirm
+            handleDelete={() => handleDelete(record.id)}
+            loading={ isDeleting }
+          />
         </Space>
       ),
     },
   ];
 
-  // Error or loading states
-  if (error) return <div>Error occurred: {error.message}</div>;
-  if (isLoading) return <div>Loading...</div>;
-
   return (
     <div>
-      {/* Filters */}
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={12} md={6}>
-            <Search
-              placeholder="Search by name..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              prefix={<SearchOutlined />}
-              allowClear
-            />
-          </Col>
+      <div style={{ marginBottom: 16 }}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleOpenModal}
+        >
+          Add Student
+        </Button>
+      </div>
 
-          <Col xs={24} sm={12} md={5}>
-            <Select
-              placeholder="Choose Gender"
-              style={{ width: "100%" }}
-              value={selectedGender}
-              onChange={setSelectedGender}
-              allowClear
-            >
-              <Option value="male">Male</Option>
-              <Option value="female">Female</Option>
-            </Select>
-          </Col>
-
-          <Col xs={24} sm={12} md={5}>
-            <Select
-              placeholder="Select Status"
-              style={{ width: "100%" }}
-              value={selectedActive}
-              onChange={setSelectedActive}
-              allowClear
-            >
-              <Option value={true}>Active</Option>
-              <Option value={false}>Inactive</Option>
-            </Select>
-          </Col>
-
-          <Col xs={24} sm={12} md={8}>
-            <Space>
-              <Button
-                icon={<ClearOutlined />}
-                onClick={clearAllFilters}
-                disabled={
-                  !searchText && !selectedGender && selectedActive === null
-                }
-              >
-                Clear Filters
-              </Button>
-              <Button type="primary" onClick={handleCreate}>
-                + Add Student
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Table */}
       <Table
-        dataSource={filteredStudents}
         columns={columns}
+        dataSource={students || []}
         rowKey="id"
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} students`,
-          position: ["bottomCenter"],
-        }}
-        locale={{
-          emptyText:
-            filteredStudents.length === 0 && students.length > 0
-              ? "No students found"
-              : "No students available",
-        }}
+        pagination={{ pageSize: 10 }}
+        loading={isCreating || isUpdating || isDeleting}
       />
 
-      {/* Modal */}
-      <ModalStudentForm
+      <StudentModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onReload={() => {}}
-        editingStudent={editingStudent}
+        onCancel={handleCloseModal}
+        onSubmit={handleSubmit}
+        loading={isCreating || isUpdating}
+        initialValues={update}
       />
     </div>
   );
 };
+
+export default Students;

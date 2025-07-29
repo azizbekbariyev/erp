@@ -5,3 +5,5 @@ export * from "./group"
 export * from "./student"
 export * from "./branches";
 export * from "./teacher";
+export * from "./lid";
+export * from "./room";

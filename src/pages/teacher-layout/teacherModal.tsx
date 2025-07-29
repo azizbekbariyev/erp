@@ -1,72 +1,31 @@
 import { Modal, Form, Input, Select } from "antd";
 import { useEffect } from "react";
-import type { TeacherTypes } from "../../types/teacher";
-import { useBranch } from "../../hooks"; // Branch hook'ini import qiling
-import { MaskedInput } from "antd-mask-input";
+import type { TeacherTypes } from "../../types";
+import { useBranch } from "../../hooks";
 
-interface TeacherModalProps {
+type Props = {
   open: boolean;
   onCancel: () => void;
-  onSubmit: (values: any) => void;
-  teacher?: TeacherTypes | null;
-  loading?: boolean;
-}
+  onSubmit: (values: TeacherTypes) => void;
+  initialValues?: TeacherTypes | null;
+};
 
-const { Option } = Select;
-
-export const TeacherModal: React.FC<TeacherModalProps> = ({
-  open,
-  onCancel,
-  onSubmit,
-  teacher,
-  loading = false,
-}) => {
+const TeacherModal = ({ open, onCancel, onSubmit, initialValues }: Props) => {
   const [form] = Form.useForm();
-
-  // Branch hook'ini ishlatish
   const { data: branchData } = useBranch();
 
-  // Modal ochilganda form ma'lumotlarini to'ldirish
   useEffect(() => {
-    if (open && teacher) {
-      form.setFieldsValue({
-        first_name: teacher.first_name || "",
-        last_name: teacher.last_name || "",
-        email: teacher.email || "",
-        password: "", // Parolni bo'sh qoldiramiz xavfsizlik uchun
-        phone: teacher.phone || "",
-        role: teacher.role || "teacher",
-        branchId: teacher.branches
-          ? teacher.branches.map((branch: any) => branch.id)
-          : [],
-      });
-    } else if (open && !teacher) {
-      // Yangi o'qituvchi uchun default qiymatlar
-      form.setFieldsValue({
-        first_name: "",
-        last_name: "",
-        email: "",
-        password: "",
-        phone: "",
-        role: "teacher",
-        branchId: [],
-      });
-    }
-  }, [open, teacher, form]);
-
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-
-      // Agar tahrirlash rejimida bo'lsa va parol bo'sh bo'lsa, parolni o'chirib tashlaymiz
-      if (teacher && !values.password) {
-        delete values.password;
+    if (open) {
+      form.resetFields();
+      if (initialValues) {
+        form.setFieldsValue(initialValues);
       }
-
-      onSubmit(values);
-    } catch (error) {
-      console.error("Form validation failed:", error);
     }
+  }, [open]);
+
+  const handleFinish = (values: any) => {
+    onSubmit(values);
+    form.resetFields();
   };
 
   const handleCancel = () => {
@@ -74,175 +33,91 @@ export const TeacherModal: React.FC<TeacherModalProps> = ({
     onCancel();
   };
 
-  // Branchlar va rolelarni extract qilish
-  const branches =
-    branchData?.data?.branch ||
-    branchData?.data?.data?.branch ||
-    branchData?.data ||
-    [];
-
-  // Backend'da mavjud role'lar (sizning response'ga qarab)
-  const roles = [
-    { value: "main teacher", label: "Asosiy o'qituvchi" },
-    { value: "teacher", label: "O'qituvchi" },
-    { value: "admin", label: "Administrator" },
-    { value: "manager", label: "Menejer" },
-  ];
-
   return (
     <Modal
-      title={teacher ? "O'qituvchini tahrirlash" : "Yangi o'qituvchi yaratish"}
       open={open}
+      title={initialValues ? "Edit Teacher" : "Add Teacher"}
       onCancel={handleCancel}
-      onOk={handleSubmit}
-      confirmLoading={loading}
-      okText={teacher ? "Saqlash" : "Yaratish"}
-      cancelText="Bekor qilish"
-      width={600}
+      onOk={() => form.submit()}
+      okText="Submit"
     >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          first_name: "",
-          last_name: "",
-          email: "",
-          password: "",
-          phone: "",
-          role: "teacher",
-          branchId: [],
-        }}
-      >
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Form.Item
+          label="First Name"
           name="first_name"
-          label="Ism"
-          rules={[
-            { required: true, message: "Ism kiritilishi shart!" },
-            {
-              min: 2,
-              message: "Ism kamida 2 ta belgidan iborat bo'lishi kerak!",
-            },
-            {
-              max: 50,
-              message: "Ism 50 ta belgidan oshmasligi kerak!",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter first name" }]}
         >
-          <Input placeholder="Ismni kiriting" />
+          <Input placeholder="e.g. Ali" />
         </Form.Item>
 
         <Form.Item
+          label="Last Name"
           name="last_name"
-          label="Familiya"
-          rules={[
-            { required: true, message: "Familiya kiritilishi shart!" },
-            {
-              min: 2,
-              message: "Familiya kamida 2 ta belgidan iborat bo'lishi kerak!",
-            },
-            {
-              max: 50,
-              message: "Familiya 50 ta belgidan oshmasligi kerak!",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter last name" }]}
         >
-          <Input placeholder="Familiyani kiriting" />
+          <Input placeholder="e.g. Valiyev" />
         </Form.Item>
 
         <Form.Item
-          name="email"
+          label="Phone"
+          name="phone"
+          rules={[{ required: true, message: "Please enter phone number" }]}
+        >
+          <Input placeholder="+998 90 123 45 67" />
+        </Form.Item>
+
+        <Form.Item
           label="Email"
+          name="email"
           rules={[
-            { required: true, message: "Email kiritilishi shart!" },
-            {
-              type: "email",
-              message: "To'g'ri email formatini kiriting!",
-            },
+            { required: true, message: "Please enter email" },
+            { type: "email", message: "Email is not valid" },
           ]}
         >
-          <Input placeholder="email@example.com" />
+          <Input placeholder="example@mail.com" />
         </Form.Item>
 
+        {!initialValues && (
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please enter password" }]}
+          >
+            <Input.Password placeholder="********" />
+          </Form.Item>
+        )}
+
         <Form.Item
-          name="password"
-          label={teacher ? "Parol (bo'sh qoldirish mumkin)" : "Parol"}
-          rules={
-            teacher
-              ? [
-                  {
-                    min: 6,
-                    message:
-                      "Parol kamida 6 ta belgidan iborat bo'lishi kerak!",
-                  },
-                ]
-              : [
-                  { required: true, message: "Parol kiritilishi shart!" },
-                  {
-                    min: 6,
-                    message:
-                      "Parol kamida 6 ta belgidan iborat bo'lishi kerak!",
-                  },
-                ]
-          }
+          label="Role"
+          name="role"
+          rules={[{ required: true, message: "Please select role" }]}
         >
-          <Input.Password
-            placeholder={
-              teacher ? "Yangi parol (ixtiyoriy)" : "Parolni kiriting"
-            }
+          <Select
+            placeholder="Select role"
+            options={[
+              { value: "teacher", label: "Teacher" },
+              { value: "admin", label: "Admin" },
+              { value: "main teacher", label: "Main Teacher" },
+            ]}
           />
         </Form.Item>
 
         <Form.Item
-          name="phone"
-          label="Telefon raqami"
-          rules={[
-            { required: true, message: "Telefon raqami kiritilishi shart!" },
-            {
-              pattern: /^[\+]?[0-9\-\(\)\s]+$/,
-              message: "To'g'ri telefon raqami formatini kiriting!",
-            },
-            {
-              min: 9,
-              message:
-                "Telefon raqami kamida 9 ta raqamdan iborat bo'lishi kerak!",
-            },
-          ]}
-        >
-          <MaskedInput mask="+998000000000" placeholder="Enter phone number" />
-        </Form.Item>
-
-        <Form.Item
-          name="role"
-          label="Rol"
-          rules={[{ required: true, message: "Rol tanlanishi shart!" }]}
-        >
-          <Select placeholder="Rolni tanlang">
-            {roles.map((role: any) => (
-              <Option key={role.value} value={role.value}>
-                {role.label}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
+          label="Branch"
           name="branchId"
-          label="Filial"
-          rules={[{ required: true, message: "Filial tanlanishi shart!" }]}
+          rules={[{ required: true, message: "Please select branch" }]}
         >
           <Select
             mode="multiple"
-            placeholder="Filiallarni tanlang"
+            placeholder="Select branches"
             loading={!branchData}
-            allowClear
-          >
-            {Array.isArray(branches) &&
-              branches.map((branch: any) => (
-                <Option key={branch.id} value={branch.id}>
-                  {branch.name}
-                </Option>
-              ))}
-          </Select>
+            options={
+              branchData?.data?.branch?.map((branch: any) => ({
+                value: branch.id,
+                label: branch.name,
+              })) || []
+            }
+          />
         </Form.Item>
       </Form>
     </Modal>

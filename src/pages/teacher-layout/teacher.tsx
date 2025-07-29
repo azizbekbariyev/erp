@@ -1,366 +1,186 @@
-import { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Space,
-  Popconfirm,
-  Input,
-  Card,
-  Row,
-  Col,
-  message,
-  Tag,
-} from "antd";
-import { SearchOutlined, ClearOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
-import { useTeacher } from "../../hooks"; // Teacher hook
-import type { TeacherTypes } from "../../types/teacher";
-import { TeacherModal } from "./teacherModal";
+import { Button, Space, Table, type TablePaginationConfig } from "antd";
+import { useGeneral, useTeacher } from "../../hooks";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { EditOutlined } from "@ant-design/icons";
+import type { TeacherTypes } from "../../types";
+import { PopConfirm } from "../../components";
+import TeacherModal from "./teacherModal";
 
-const { Search } = Input;
-
-export const Teachers = () => {
-  const [teachers, setTeachers] = useState<TeacherTypes[]>([]);
-  const [filteredTeachers, setFilteredTeachers] = useState<TeacherTypes[]>([]);
-  const [searchText, setSearchText] = useState("");
-
-  // Modal holatlari
+const Teacher = () => {
+  const [params, setParams] = useState({
+    page: 1,
+    limit: 10,
+  });
+  const {
+    data,
+    isLoading,
+    useTeacherDelete,
+    useTeacherCreate,
+    useTeacherUpdate,
+  } = useTeacher(params);
+  const { mutate: deleteMutation, isPending: isDeleting } = useTeacherDelete();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherTypes | null>(
     null
   );
 
-  // Hooks
-  const {
-    data: teacherData,
-    useTeacherCreate,
-    useTeacherDelete,
-    useTeacherUpdate,
-  } = useTeacher();
-
-  // Mutation hooks
-  const createMutation = useTeacherCreate();
-  const updateMutation = useTeacherUpdate();
-  const deleteMutation = useTeacherDelete();
-
-  // useEffect orqali teacherData kelyapti va teachers holatiga o'rnatilyapti
-  useEffect(() => {
-    console.log("Teacher data received:", teacherData);
-
-    if (teacherData && teacherData.data) {
-      // Backend dan data.teachers formatida kelyapti
-      const teachersData =
-        teacherData.data.teachers ||
-        teacherData.data.data?.teachers ||
-        teacherData.data ||
-        [];
-
-      console.log("Extracted teachers:", teachersData);
-
-      if (Array.isArray(teachersData)) {
-        setTeachers(teachersData);
-      } else {
-        console.log("Teachers data is not array:", teachersData);
-        setTeachers([]);
-      }
-    } else {
-      console.log("No teacher data, setting empty array");
-      setTeachers([]);
-    }
-  }, [teacherData]);
-
-  // Qidiruv funksionaliteti
-  useEffect(() => {
-    let filtered = [...teachers];
-    if (searchText) {
-      filtered = filtered.filter(
-        (teacher) =>
-          teacher.first_name
-            ?.toLowerCase()
-            .includes(searchText.toLowerCase()) ||
-          teacher.last_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-          teacher.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-          teacher.phone?.toLowerCase().includes(searchText.toLowerCase()) ||
-          teacher.role?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-    setFilteredTeachers(filtered);
-  }, [teachers, searchText]);
-
-  // O'qituvchini o'chirish funksiyasi
-  const handleDelete = (teacher: any) => {
-    deleteMutation.mutate(teacher.id, {
-      onSuccess: () => {
-        message.success("O'qituvchi muvaffaqiyatli o'chirildi");
-        setTeachers((prev) => prev.filter((t: any) => t.id !== teacher.id));
-      },
-      onError: (error) => {
-        message.error("O'qituvchini o'chirishda xatolik yuz berdi");
-        console.error("Delete error:", error);
-      },
-    });
+  const {mutate: createMutation} = useTeacherCreate();
+  const { mutate: updateMutation, isPending: isUpdating } = useTeacherUpdate();
+  const teachers = data?.data.data;
+  const { handlePagination } = useGeneral();
+  const location = useLocation();
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    handlePagination({ pagination, setParams });
   };
 
-  // Yangi o'qituvchi yaratish uchun modal ochish
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+    if (page && limit) {
+      setParams(() => ({
+        page: Number(page),
+        limit: Number(limit),
+      }));
+    }
+  }, [location.search]);
+
+  const handleDelete = (id: number) => {
+    deleteMutation(id);
+  };
+
   const handleCreate = () => {
     setSelectedTeacher(null);
     setModalOpen(true);
   };
 
-  // O'qituvchini tahrirlash uchun modal ochish
-  const handleUpdate = (teacher: any) => {
-    setSelectedTeacher(teacher);
+  const handleUpdate = (record: TeacherTypes) => {
+    setSelectedTeacher(record);
     setModalOpen(true);
   };
 
-  // Modal yopish
-  const handleModalCancel = () => {
-    setModalOpen(false);
-    setSelectedTeacher(null);
-  };
-
-  // Modal submit (yaratish yoki tahrirlash)
   const handleModalSubmit = (values: any) => {
-    console.log("=== TEACHER SUBMIT DEBUG ===");
-    console.log("📋 Values received from modal:", values);
-    console.log("👤 Selected teacher:", selectedTeacher);
-    console.log("🔄 Is updating?", !!selectedTeacher);
-
     if (selectedTeacher) {
-      // O'qituvchini tahrirlash
-      const updateData = {
-        id: (selectedTeacher as any).id,
-        data: values,
-      };
+    updateMutation({ id: selectedTeacher.id, data: values });
+  } else {
+    createMutation(values);
+  }
+  setModalOpen(false);
+  }
 
-      console.log("🚀 UPDATE REQUEST:", updateData);
-
-      updateMutation.mutate(updateData, {
-        onSuccess: (response) => {
-          console.log("✅ Update SUCCESS response:", response);
-          message.success("O'qituvchi muvaffaqiyatli tahrirlandi");
-
-          // Backend'dan kelayotgan response formatiga qarab
-          const updatedTeacher =
-            response?.data?.teachers ||
-            response?.data?.data?.teachers ||
-            response?.data ||
-            values;
-
-          setTeachers((prev) =>
-            prev.map((teacher: any) =>
-              teacher.id === (selectedTeacher as any).id
-                ? { ...teacher, ...updatedTeacher }
-                : teacher
-            )
-          );
-          setModalOpen(false);
-          setSelectedTeacher(null);
-        },
-        onError: (error) => {
-          message.error("O'qituvchini tahrirlashda xatolik yuz berdi");
-          setModalOpen(true);
-          console.error("Update error:", error);
-        },
-      });
-    } else {
-      // Yangi o'qituvchi yaratish
-      createMutation.mutate(values, {
-        onSuccess: (response) => {
-          message.success("Yangi o'qituvchi muvaffaqiyatli yaratildi");
-          console.log("Create response:", response);
-
-          // Backend'dan kelayotgan response formatiga qarab
-          const newTeacher = response?.data?.teachers ||
-            response?.data?.data?.teachers ||
-            response?.data || { ...values, id: Date.now() };
-
-          setTeachers((prev) => [...prev, newTeacher]);
-          setModalOpen(false);
-        },
-        onError: (error) => {
-          message.error("O'qituvchi yaratishda xatolik yuz berdi");
-          console.error("Create error:", error);
-        },
-      });
-    }
-  };
-
-  // Filtrlarni tozalash funksiyasi
-  const clearFilters = () => {
-    setSearchText("");
-  };
-
-  // Jadval ustunlari konfiguratsiyasi
   const columns = [
     {
       title: "ID",
-      render: (_: any, __: any, index: number) => index + 1,
-      width: 60,
+      dataIndex: "id",
+      key: "id",
     },
     {
-      title: "Ism",
+      title: "First name",
       dataIndex: "first_name",
       key: "first_name",
-      sorter: (a: any, b: any) =>
-        (a.first_name || "").localeCompare(b.first_name || ""),
     },
     {
-      title: "Familiya",
+      title: "Last name",
       dataIndex: "last_name",
       key: "last_name",
-      sorter: (a: any, b: any) =>
-        (a.last_name || "").localeCompare(b.last_name || ""),
+    },
+    {
+      title: "Phone number",
+      dataIndex: "phone",
+      key: "phone",
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      ellipsis: true,
-      width: 200,
     },
     {
-      title: "Telefon",
-      dataIndex: "phone",
-      key: "phone",
-      render: (phone: string) => phone || "Noma'lum",
-    },
-    {
-      title: "Rol",
+      title: "Role",
       dataIndex: "role",
       key: "role",
-      render: (role: string) => (
-        <Tag
-          color={
-            role === "admin" ? "red" : role === "teacher" ? "blue" : "green"
-          }
-        >
-          {role || "Noma'lum"}
-        </Tag>
-      ),
     },
     {
-      title: "Filiallar",
-      dataIndex: "branches",
-      key: "branches",
-      render: (branches: any[]) => {
-        if (!branches || branches.length === 0) return "Filial biriktirilmagan";
-        return branches.map((branch) => branch.name).join(", ");
-      },
-      width: 200,
-      ellipsis: true,
+      title: "Status",
+      dataIndex: "is_active",
+      key: "is_active",
+      render: (value: boolean) => (value ? "✅ Ha" : "❌ Yo'q"),
     },
     {
-      title: "Yaratilgan sana",
+      title: "Rasm",
+      dataIndex: "avatar_url",
+      key: "avatar_url",
+      render: (url: string) =>
+        url ? (
+          <img
+            src={url}
+            alt="Avatar"
+            style={{ width: 40, height: 40, borderRadius: "50%" }}
+          />
+        ) : (
+          "Yo'q"
+        ),
+    },
+    {
+      title: "Created At",
       dataIndex: "created_at",
       key: "created_at",
-      render: (date: string) =>
-        date ? new Date(date).toLocaleDateString("uz-UZ") : "Noma'lum",
-      sorter: (a: any, b: any) =>
-        new Date(a.created_at || "").getTime() -
-        new Date(b.created_at || "").getTime(),
+      render: (value: string) => new Date(value).toLocaleString("uz-UZ"),
     },
     {
       title: "Actions",
       render: (_: any, record: TeacherTypes) => (
         <Space>
           <Button
+            type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
+            disabled={isUpdating}
           />
-          <Popconfirm
-            title="Are you sure you want to delete this group?"
-            onConfirm={() => handleDelete(record)}
-          >
-            <Button className="w-[20%]">🗑</Button>
-          </Popconfirm>
+          <PopConfirm
+            handleDelete={() => handleDelete(record.id)}
+            loading={isDeleting}
+          />
         </Space>
       ),
     },
   ];
-
-  // Loading va error holatlari
-  const isLoading = !teacherData;
-
-  if (isLoading) {
-    return (
-      <div style={{ padding: 20, textAlign: "center" }}>
-        <h3>O'qituvchilar yuklanmoqda...</h3>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: 20 }}>
-      <h1 style={{ marginBottom: 20 }}>O'qituvchilar</h1>
+    <div>
+      <Button
+        type="primary"
+        onClick={handleCreate}
+        style={{ marginBottom: 16 }}
+      >
+        + Add Teacher
+      </Button>
 
-      {/* Filtrlar va Yangi o'qituvchi yaratish tugmasi */}
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={12} md={8}>
-            <Search
-              placeholder="Ism, familiya, email, telefon..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              prefix={<SearchOutlined />}
-              allowClear
-            />
-          </Col>
-
-          <Col xs={24} sm={12} md={16}>
-            <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-              <Button
-                icon={<ClearOutlined />}
-                onClick={clearFilters}
-                disabled={!searchText}
-              >
-                Tozalash
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleCreate}
-              >
-                Yangi o'qituvchi
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Jadval */}
-      <Card>
-        <Table
-          dataSource={filteredTeachers}
-          columns={columns}
-          rowKey="id"
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} / ${total} ta o'qituvchi`,
-            position: ["bottomCenter"],
-          }}
-          locale={{
-            emptyText:
-              filteredTeachers.length === 0 && teachers.length > 0
-                ? "Hech qanday o'qituvchi topilmadi"
-                : "O'qituvchilar mavjud emas",
-          }}
-          scroll={{ x: 1200 }}
-        />
-      </Card>
-
-      {/* Modal */}
+      <Table
+        dataSource={teachers}
+        columns={columns}
+        rowKey="id"
+        loading={isLoading}
+        pagination={{
+          current: params.page,
+          pageSize: params.limit,
+          total: data?.data.total,
+          showSizeChanger: true,
+          pageSizeOptions: ["5", "10", "20"],
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} teachers`,
+          position: ["bottomCenter"],
+        }}
+        onChange={handleTableChange}
+      />
       <TeacherModal
         open={modalOpen}
-        onCancel={handleModalCancel}
+        onCancel={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
-        teacher={selectedTeacher}
-        loading={createMutation.isPending || updateMutation.isPending}
+        initialValues={selectedTeacher}
       />
     </div>
   );
 };
 
-export default Teachers;
+export default Teacher;

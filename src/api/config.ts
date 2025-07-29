@@ -4,6 +4,7 @@ import { Notification } from "@helper/notification";
 export function apiConfig() {
   async function getRequest(url: string, params: Object = {}) {
     try {
+      console.log(url, params);
       const res = await axiosInstance.get(url, { params });
       return res;
     } catch (error: any) {

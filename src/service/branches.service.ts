@@ -1,15 +1,15 @@
 import { ApiUrls } from '@api/api-urls';
 import { apiConfig } from "@api/config"
-import type { BranchesTypes } from "@/types"
+import type { BranchTypes } from "@/types"
 
 export const BrancheService = {
     getAllBranches (){
         return apiConfig().getRequest(ApiUrls.BRANCHES)
     },
-    createBranche(model:BranchesTypes){
+    createBranche(model:BranchTypes){
         return apiConfig().postRequest(ApiUrls.BRANCHES, model)
     },
-    updateBranches(model:BranchesTypes, id:number){
+    updateBranches(model:BranchTypes, id:number){
         return apiConfig().putRequest(`${ApiUrls.BRANCHES}/${id}`, model)
     },
     deleteBranches(id:number){

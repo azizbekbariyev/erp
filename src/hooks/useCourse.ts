@@ -39,7 +39,7 @@ export const useCourse = (params:ParamsType) => {
 
   const deleteCourse = () => {
     return useMutation({
-      mutationFn: async ({ id }: { id: number }) =>
+      mutationFn: async (id: number ) =>
         CourseService.deleteCoruse(id),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["courses"] });

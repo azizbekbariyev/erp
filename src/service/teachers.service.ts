@@ -1,10 +1,10 @@
 import { apiConfig } from "@api/config"
 import { ApiUrls } from "@api/api-urls"
-import type { TeacherTypes } from "@types";
+import type { ParamsType, TeacherTypes } from "@types";
 
 export const TeacherSerivce = {
-    getAllTeacher(){
-        return apiConfig().getRequest(ApiUrls.TEACHER)
+    getAllTeacher(params:ParamsType){
+        return apiConfig().getRequest(ApiUrls.TEACHER, params)
     },
     createTeacher(model:TeacherTypes){
         return apiConfig().postRequest(ApiUrls.TEACHER, model);

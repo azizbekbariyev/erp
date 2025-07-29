@@ -1,12 +1,12 @@
 import { Modal, Form, Input } from "antd";
 import { useEffect } from "react";
-import type { BranchesTypes } from "@types";
+import type { BranchTypes } from "@types";
 import { MaskedInput } from "antd-mask-input";
 interface BranchModalProps {
   open: boolean;
   onCancel: () => void;
   onSubmit: (values: any) => void;
-  branch?: BranchesTypes | null;
+  branch?: BranchTypes | null;
   loading?: boolean;
 }
 

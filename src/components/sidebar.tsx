@@ -46,6 +46,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       icon: <UserSwitchOutlined />,
       label: <Link to="/admin/teachers">Teachers</Link>,
     },
+    {
+      key: "/admin/rooms",
+      icon: <ShopOutlined />,
+      label: <Link to="/admin/rooms">Rooms</Link>,
+    }
   ];
 
   return (

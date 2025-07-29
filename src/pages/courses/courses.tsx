@@ -1,161 +1,95 @@
-import { useState } from "react";
-import {
-  Table,
-  Button,
-  Space,
-  Popconfirm,
-  message,
-  type TablePaginationConfig,
-} from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import type { CoursesTypes } from "@types";
-import { useCourse } from "@hooks";
+import { Button, Space, Table, type TablePaginationConfig } from "antd";
+import { useCourse, useGeneral } from "../../hooks";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useGeneral } from "@hooks";
-import { CourseModal } from "./courseModal";
+import { EditOutlined } from "@ant-design/icons";
+import type { CoursesTypes } from "../../types";
+import { PopConfirm } from "../../components";
+import CourseModal from "./courseModal";
 
-export const Courses = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const initialPage = Number(queryParams.get("page")) || 1;
-  const initialLimit = Number(queryParams.get("limit")) || 10;
-
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [pageSize, setPageSize] = useState(initialLimit);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(
-    null
-  );
-  const [mode, setMode] = useState<"create" | "update">("create");
-
-  const { handlePagination } = useGeneral();
+const Course = () => {
+  const [params, setParams] = useState({ page: 1, limit: 10 });
   const {
-    data: courseData,
+    data,
     isLoading,
-    deleteCourse,
     createCourse,
     updateCourse,
-  } = useCourse({
-    page: currentPage,
-    limit: pageSize,
-  });
+    deleteCourse,
+  } = useCourse(params);
+  const { mutate: createMutation } = createCourse();
+  const { mutate: updateMutation, isPending: isUpdating } = updateCourse();
+  const { mutate: deleteMutation, isPending: isDeleting } = deleteCourse();
 
-  const deleteMutation = deleteCourse();
-  const createMutation = createCourse();
-  const updateMutation = updateCourse();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(null);
+  const location = useLocation();
+  const { handlePagination } = useGeneral();
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
-    handlePagination({
-      pagination,
-      setParams: ({ page, limit }) => {
-        setCurrentPage(page);
-        setPageSize(limit);
-      },
-    });
+    handlePagination({ pagination, setParams });
   };
 
-  const handleDelete = (course: CoursesTypes) => {
-    deleteMutation.mutate(
-      { id: course.id },
-      {
-        onSuccess: () => message.success("Course deleted successfully"),
-        onError: () => message.error("Failed to delete course"),
-      }
-    );
-  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+    if (page && limit) {
+      setParams({ page: Number(page), limit: Number(limit) });
+    }
+  }, [location.search]);
 
   const handleCreate = () => {
     setSelectedCourse(null);
-    setMode("create");
     setModalOpen(true);
   };
 
-  const handleUpdate = (course: CoursesTypes) => {
-    setSelectedCourse(course);
-    setMode("update");
+  const handleUpdate = (record: CoursesTypes) => {
+    setSelectedCourse(record);
     setModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedCourse(null);
+  const handleDelete = (id: number) => {
+    deleteMutation(id);
   };
 
-  const handleModalSubmit = (values: any) => {
-    if (mode === "update" && selectedCourse) {
-      updateMutation.mutate(
-        { id: selectedCourse.id, data: values },
-        {
-          onSuccess: () => {
-            message.success("Course updated successfully");
-            handleCloseModal();
-          },
-          onError: () => message.error("Failed to update course"),
-        }
-      );
+  const handleModalSubmit = (values: CoursesTypes) => {
+    if (selectedCourse) {
+      updateMutation({ id: selectedCourse.id, data: values });
     } else {
-      createMutation.mutate(values, {
-        onSuccess: () => {
-          message.success("New course created successfully");
-          handleCloseModal();
-        },
-        onError: () => message.error("Failed to create course"),
-      });
+      createMutation(values);
     }
+    setModalOpen(false);
   };
 
   const columns = [
-    {
-      title: "#",
-      render: (_: any, __: any, index: number) =>
-        (currentPage - 1) * pageSize + index + 1,
-    },
-    {
-      title: "Title",
-      dataIndex: "title",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-      render: (price: number) =>
-        price ? `${price.toLocaleString()} UZS` : "Free",
-    },
-    {
-      title: "Duration",
-      dataIndex: "duration",
-    },
+    { title: "Name", dataIndex: "title", key: "title" },
+    { title: "Description", dataIndex: "description", key: "description" },
+    { title: "Price", dataIndex: "price", key: "price" },
+    { title: "Duration", dataIndex: "duration", key: "duration" },
+    { title: "Lessons in a week", dataIndex: "lessons_in_a_week", key: "lessons_in_a_week" },
+    { title: "Lessons in a month", dataIndex: "lessons_in_a_month", key: "lessons_in_a_month" },
+    { title: "Lesson duration", dataIndex: "lesson_duration", key: "lesson_duration" },
     {
       title: "Status",
       dataIndex: "is_active",
-      render: (active: boolean) => (
-        <span
-          style={{
-            color: active ? "#52c41a" : "#ff4d4f",
-            fontWeight: "bold",
-          }}
-        >
-          {active ? "Active" : "Inactive"}
-        </span>
-      ),
+      key: "is_active",
+      render: (val: boolean) => (val ? "✅ Ha" : "❌ Yo'q"),
     },
     {
       title: "Actions",
+      key: "actions",
       render: (_: any, record: CoursesTypes) => (
         <Space>
           <Button
+            type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
+            disabled={isUpdating}
           />
-          <Popconfirm
-            title="Are you sure you want to delete this group?"
-            onConfirm={() => handleDelete(record)}
-          >
-            <Button className="w-[20%]">🗑</Button>
-          </Popconfirm>
+          <PopConfirm
+            handleDelete={() => handleDelete(record.id)}
+            loading={isDeleting}
+          />
         </Space>
       ),
     },
@@ -163,29 +97,19 @@ export const Courses = () => {
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h2>Courses</h2>
-        <Button type="primary" onClick={handleCreate}>
-          + Add Course
-        </Button>
-      </div>
+      <Button type="primary" onClick={handleCreate} style={{ marginBottom: 16 }}>
+        + Add Course
+      </Button>
 
-      <Table<CoursesTypes>
-        dataSource={courseData}
+      <Table
+        dataSource={data}
         columns={columns}
         rowKey="id"
         loading={isLoading}
         pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: courseData?.data?.total || 0,
+          current: params.page,
+          pageSize: params.limit,
+          total: data?.data?.total,
           showSizeChanger: true,
           pageSizeOptions: ["5", "10", "20"],
           showQuickJumper: true,
@@ -198,14 +122,13 @@ export const Courses = () => {
 
       <CourseModal
         open={modalOpen}
-        onCancel={handleCloseModal}
+        onCancel={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
-        course={selectedCourse}
-        mode={mode}
-        loading={createMutation.isPending || updateMutation.isPending}
+        initialValues={selectedCourse}
+        
       />
     </div>
   );
 };
 
-export default Courses;
+export default Course;

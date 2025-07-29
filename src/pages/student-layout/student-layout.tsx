@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Students } from "./student";
+import Students from "./student";
 
 const StudentLayout = () => {
   return (
