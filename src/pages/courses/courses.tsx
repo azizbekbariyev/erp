@@ -9,16 +9,13 @@ import CourseModal from "./courseModal";
 
 const Course = () => {
   const [params, setParams] = useState({ page: 1, limit: 10 });
-  const { data, isLoading, createCourse, updateCourse, deleteCourse } =
-    useCourse(params);
-  const { mutate: createMutation } = createCourse();
+  const { data, isLoading, createCourse, updateCourse, deleteCourse } = useCourse(params);
+  const { mutate: createMutation, isPending: isCreating } = createCourse();
   const { mutate: updateMutation, isPending: isUpdating } = updateCourse();
   const { mutate: deleteMutation, isPending: isDeleting } = deleteCourse();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(
-    null
-  );
+  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(null);
   const location = useLocation();
   const { handlePagination } = useGeneral();
 
@@ -64,17 +61,17 @@ const Course = () => {
     { title: "Price", dataIndex: "price", key: "price" },
     { title: "Duration", dataIndex: "duration", key: "duration" },
     {
-      title: "Lessons in a week",
+      title: "Lessons in a Week",
       dataIndex: "lessons_in_a_week",
       key: "lessons_in_a_week",
     },
     {
-      title: "Lessons in a month",
+      title: "Lessons in a Month",
       dataIndex: "lessons_in_a_month",
       key: "lessons_in_a_month",
     },
     {
-      title: "Lesson duration",
+      title: "Lesson Duration",
       dataIndex: "lesson_duration",
       key: "lesson_duration",
     },
@@ -93,7 +90,7 @@ const Course = () => {
             type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
-            disabled={isUpdating}
+            disabled={isUpdating || isCreating}
           />
           <PopConfirm
             handleDelete={() => handleDelete(record.id)}
@@ -110,24 +107,24 @@ const Course = () => {
         type="primary"
         onClick={handleCreate}
         style={{ marginBottom: 16 }}
+        disabled={isCreating || isUpdating}
       >
         + Add Course
       </Button>
 
       <Table
-        dataSource={data || []}
+        dataSource={data}
         columns={columns}
         rowKey="id"
         loading={isLoading}
         pagination={{
           current: params.page,
           pageSize: params.limit,
-          total: data?.data?.total,
+          total: data?.total || 0,
           showSizeChanger: true,
           pageSizeOptions: ["5", "10", "20"],
           showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} courses`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} courses`,
           position: ["bottomCenter"],
         }}
         onChange={handleTableChange}
@@ -137,7 +134,9 @@ const Course = () => {
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
-        initialValues={selectedCourse}
+        course={selectedCourse}
+        mode={selectedCourse ? "update" : "create"}
+        loading={isCreating || isUpdating}
       />
     </div>
   );

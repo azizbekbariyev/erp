@@ -5,27 +5,50 @@ import type { CoursesTypes } from "@types";
 interface CourseModalProps {
   open: boolean;
   onCancel: () => void;
-  onSubmit: (values: any) => void;
+  onSubmit: (values: CoursesTypes) => void;
   course?: CoursesTypes | null;
   loading?: boolean;
   mode: "create" | "update";
 }
 
 const { TextArea } = Input;
+
 export const CourseModal: React.FC<CourseModalProps> = ({
   open,
   onCancel,
   onSubmit,
   course,
   loading = false,
+  mode,
 }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    
-  }, [open, course, form]);
+    if (open) {
+      if (course && mode === "update") {
+        form.setFieldsValue({
+          title: course.title,
+          description: course.description,
+          price: course.price,
+          duration: course.duration,
+          lessons_in_a_week: course.lesson_in_a_week,
+          lessons_in_a_month: course.lessons_in_a_month,
+          lesson_duration: course.lesson_duration,
+        });
+      } else {
+        form.resetFields();
+      }
+    }
+  }, [open, course, form, mode]);
 
   const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      onSubmit(values);
+      form.resetFields()
+    } catch (error) {
+      console.error("Form validation failed:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -35,12 +58,12 @@ export const CourseModal: React.FC<CourseModalProps> = ({
 
   return (
     <Modal
-      title={course ? "Edit Course" : "Create New Course"}
+      title={mode === "update" ? "Edit Course" : "Create New Course"}
       open={open}
       onCancel={handleCancel}
       onOk={handleSubmit}
       confirmLoading={loading}
-      okText={course ? "Save" : "Create"}
+      okText={mode === "update" ? "Save" : "Create"}
       cancelText="Cancel"
       width={600}
     >
@@ -51,9 +74,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({
           title: "",
           description: "",
           price: 0,
-          duration: "",
-          lessons_in_a_week: 1,
-          lesson_duration: "",
+          duration: 1,
+          lessons_in_a_week: 3,
+          lessons_in_a_month: 12,
+          lesson_duration: 120,
         }}
       >
         <Form.Item
@@ -67,7 +91,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({
         <Form.Item
           name="price"
           label="Price (UZS)"
-          rules={[{ required: true, message: "Price is required!" }]}
+          rules={[
+            { required: true, message: "Price is required!" },
+            { type: "number", min: 0, message: "Price must be non-negative!" },
+          ]}
         >
           <InputNumber
             style={{ width: "100%" }}
@@ -80,7 +107,10 @@ export const CourseModal: React.FC<CourseModalProps> = ({
         <Form.Item
           name="duration"
           label="Course Duration (in months)"
-          rules={[{ required: true, message: "Duration is required!" }]}
+          rules={[
+            { required: true, message: "Duration is required!" },
+            { type: "number", min: 1, max: 24, message: "Duration must be between 1 and 24 months!" },
+          ]}
         >
           <InputNumber
             style={{ width: "100%" }}
@@ -93,11 +123,15 @@ export const CourseModal: React.FC<CourseModalProps> = ({
         <Form.Item
           name="lessons_in_a_week"
           label="Lessons per Week"
-          rules={[
-            { required: true, message: "Please select lessons per week!" },
-          ]}
+          rules={[{ required: true, message: "Please select lessons per week!" }]}
         >
-          <Select placeholder="Select lessons per week">
+          <Select
+            placeholder="Select lessons per week"
+            onChange={(value) => {
+              // Auto-calculate lessons per month (assuming 4 weeks/month)
+              form.setFieldsValue({ lessons_in_a_month: value * 4 });
+            }}
+          >
             <Select.Option value={3}>3</Select.Option>
             <Select.Option value={5}>5</Select.Option>
           </Select>
@@ -106,9 +140,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
         <Form.Item
           name="lessons_in_a_month"
           label="Lessons per Month"
-          rules={[
-            { required: true, message: "Please select lessons per month!" },
-          ]}
+          rules={[{ required: true, message: "Please select lessons per month!" }]}
         >
           <Select placeholder="Select lessons per month">
             <Select.Option value={12}>12</Select.Option>
@@ -119,9 +151,7 @@ export const CourseModal: React.FC<CourseModalProps> = ({
         <Form.Item
           name="lesson_duration"
           label="Lesson Duration (minutes)"
-          rules={[
-            { required: true, message: "Please select lesson duration!" },
-          ]}
+          rules={[{ required: true, message: "Please select lesson duration!" }]}
         >
           <Select placeholder="Select lesson duration">
             <Select.Option value={120}>2 hours (120 mins)</Select.Option>

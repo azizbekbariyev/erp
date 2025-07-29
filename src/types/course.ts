@@ -7,5 +7,6 @@
     price:number
     duration:string
     lesson_in_a_week:number
+    lessons_in_a_month:number
     lesson_duration:string
 }
