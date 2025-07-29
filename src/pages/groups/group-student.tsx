@@ -14,8 +14,14 @@ const GroupStudentModal = ({ open, onClose, refetch }: Props) => {
   const { id } = useParams();
   const groupId = Number(id);
   const { reset } = useForm<StudentTypes>();
-  const { data: students, isLoading } = useStudent();
-  const { useGroupAddStudent, useGroupById } = useGroup();
+  const { data: students, isLoading } = useStudent({
+    page: 1,
+    limit: 10,
+  });
+  const { useGroupAddStudent, useGroupById } = useGroup({
+    page: 1,
+    limit: 10,
+  });
   const { mutate } = useGroupAddStudent();
   const { data: group } = useGroupById(Number(id));
 
