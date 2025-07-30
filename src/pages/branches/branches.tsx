@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
+import { Table, Button, Space, Input, Card, Row, Col, message } from "antd";
 import {
-  Table,
-  Button,
-  Space,
-  Input,
-  Card,
-  Row,
-  Col,
-  message,
-} from "antd";
-import { SearchOutlined, ClearOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
+  SearchOutlined,
+  ClearOutlined,
+  PlusOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import { useBranch } from "@hooks";
 import type { BranchTypes } from "@types";
 import { BranchModal } from "./brancheMadol";
@@ -34,10 +30,12 @@ export const Branches = () => {
     useBranchUpdate,
   } = useBranch();
 
-  // Mutation hooks
-  const {mutate:createMutation, isPending: isCreatePending} = useBranchCreate();
-  const {mutate:updateMutation, isPending: isUpdatePending} = useBranchUpdate();
-  const {mutate:deleteMutation, isPending: isDeletePending} = useBranchDelete();
+  const { mutate: createMutation, isPending: isCreatePending } =
+    useBranchCreate();
+  const { mutate: updateMutation, isPending: isUpdatePending } =
+    useBranchUpdate();
+  const { mutate: deleteMutation, isPending: isDeletePending } =
+    useBranchDelete();
 
   useEffect(() => {
     console.log("Branch data received:", branchData);
@@ -63,7 +61,6 @@ export const Branches = () => {
     }
   }, [branchData]);
 
-  // Search functionality
   useEffect(() => {
     let filtered = [...branches];
     if (searchText) {
@@ -107,53 +104,9 @@ export const Branches = () => {
 
   const handleModalSubmit = (values: any) => {
     if (selectedBranch) {
-      updateMutation(
-        { id: (selectedBranch as any).id, data: values },
-        {
-          onSuccess: (response) => {
-            message.success("Branch updated successfully");
-            console.log("Update response:", response);
-
-            const updatedBranch =
-              response?.data?.data?.branch ||
-              response?.data?.branch ||
-              response?.data ||
-              values;
-
-            setBranches((prev) =>
-              prev.map((branch: any) =>
-                branch.id === (selectedBranch as any).id
-                  ? { ...branch, ...updatedBranch }
-                  : branch
-              )
-            );
-            setModalOpen(false);
-            setSelectedBranch(null);
-          },
-          onError: (error) => {
-            message.error("Error occurred while updating branch");
-            console.error("Update error:", error);
-          },
-        }
-      );
+      updateMutation({ id: selectedBranch.id, data: values });
     } else {
-      createMutation(values, {
-        onSuccess: (response) => {
-          message.success("New branch created successfully");
-          console.log("Create response:", response);
-
-          const newBranch = response?.data?.data?.branch ||
-            response?.data?.branch ||
-            response?.data || { ...values, id: Date.now() };
-
-          setBranches((prev) => [...prev, newBranch]);
-          setModalOpen(false);
-        },
-        onError: (error) => {
-          message.error("Error occurred while creating branch");
-          console.error("Create error:", error);
-        },
-      });
+      createMutation(values);
     }
   };
 
@@ -206,8 +159,9 @@ export const Branches = () => {
             onClick={() => handleUpdate(record)}
           />
           <PopConfirm
-            handleDelete={() => handleDelete(record)} 
-            loading={isDeletePending}/>
+            handleDelete={() => handleDelete(record)}
+            loading={isDeletePending}
+          />
         </Space>
       ),
     },
@@ -225,42 +179,14 @@ export const Branches = () => {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1 style={{ marginBottom: 20 }}>Branches</h1>
-
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={12} md={8}>
-            <Search
-              placeholder="Branch name, address or phone..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              prefix={<SearchOutlined />}
-              allowClear
-            />
-          </Col>
-
-          <Col xs={24} sm={12} md={16}>
-            <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-              <Button
-                icon={<ClearOutlined />}
-                onClick={clearFilters}
-                disabled={!searchText}
-              >
-                Clear
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleCreate}
-              >
-                New Branch
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Table */}
+      <div className="flex justify-between">
+        <h1 style={{ marginBottom: 20 }}>Branches</h1>
+        <Space>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+            New Branch
+          </Button>
+        </Space>
+      </div>
       <Card>
         <Table
           dataSource={filteredBranches}

@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BrancheService } from "@service/branches.service";
 import type { BranchTypes } from "@types";
 
-
 export const useBranch = () => {
   const queryClinet = useQueryClient();
   const { data } = useQuery({
@@ -12,7 +11,8 @@ export const useBranch = () => {
 
   const useBranchCreate = () => {
     return useMutation({
-      mutationFn: async (data: BranchTypes) => BrancheService.createBranche(data),
+      mutationFn: async (data: BranchTypes) =>
+        BrancheService.createBranche(data),
       onSuccess: () => {
         queryClinet.invalidateQueries({ queryKey: ["branch"] });
       },
@@ -21,7 +21,8 @@ export const useBranch = () => {
 
   const useBranchUpdate = () => {
     return useMutation({
-      mutationFn: async ({id, data}:{id:number;data: BranchTypes}) => BrancheService.updateBranches(data,id),
+      mutationFn: async ({ id, data }: { id: number; data: BranchTypes }) =>
+        BrancheService.updateBranches(data, id),
       onSuccess: () => {
         queryClinet.invalidateQueries({ queryKey: ["branch"] });
       },

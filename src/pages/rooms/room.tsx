@@ -28,7 +28,7 @@ const Room = () => {
       }));
     }
   }, [location.search]);
-
+  
   const handleTableChange = (pagination: TablePaginationConfig) => {
     handlePagination({ pagination, setParams });
   };
@@ -42,6 +42,7 @@ const Room = () => {
     page: 1,
     limit: 10,
   });
+  console.log(roomData);
   const { mutate: deleteMutation, isPending: isDeleting } = deleteRoom();
   const { mutate: createMutation } = createRoom();
   const { mutate: updateMutation, isPending: isUpdating } = updateRoom();
@@ -76,15 +77,7 @@ const Room = () => {
     {
       title: "Branch",
       dataIndex: "branch",
-      render: (branch: { title: string }) => <span>{branch.title}</span>,
-    },
-    {
-      title: "Create At",
-      dataIndex: "created_at",
-    },
-    {
-      title: "Update At",
-      dataIndex: "updated_at",
+      render: (branch: { name: string }) => <span>{branch.name}</span>,
     },
     {
       title: "Action",

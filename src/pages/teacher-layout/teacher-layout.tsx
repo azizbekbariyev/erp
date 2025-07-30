@@ -10,7 +10,6 @@ export const TeacherLayout = () => {
           justifyContent: "space-between",
           marginBottom: 24,
         }}>
-        <h1 style={{ margin: 0 }}> Teachers</h1>
       </div>
       <Teachers />
       <Outlet />

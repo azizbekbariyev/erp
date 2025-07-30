@@ -136,7 +136,8 @@ const Students = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <div className="flex justify-between" style={{ marginBottom: 16 }}>
+        <h1>Students</h1>
         <Button
           type="primary"
           icon={<PlusOutlined />}

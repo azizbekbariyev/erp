@@ -38,9 +38,9 @@ export const useGroup = (params: ParamsType, id?: number) => {
 
   const useGroupById = (id: number) => {
     return useQuery({
+      enabled: !!id,
       queryKey: ["group", id],
       queryFn: async () => GroupService.getGroupById(id),
-      enabled: !!id,
     });
   };
 

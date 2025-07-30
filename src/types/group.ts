@@ -23,9 +23,21 @@ export interface GroupLessonsType {
 }
 
 export interface GroupStudentsType {
-  students:StudentTypes[]
+  students:{
+    id: number;
+    start_date: string;
+    end_date: string;
+    status: boolean;
+    student: StudentTypes
+  }[]
 }
 
 export interface GroupTeachersType {
-  teachers:TeacherTypes[]
+  teachers: {
+    id: number;
+    start_date: string;
+    end_date: string;
+    status: boolean;
+    teacher: TeacherTypes;
+  }[];
 }

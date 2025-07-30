@@ -25,7 +25,7 @@ const Teacher = () => {
     null
   );
 
-  const {mutate: createMutation} = useTeacherCreate();
+  const { mutate: createMutation } = useTeacherCreate();
   const { mutate: updateMutation, isPending: isUpdating } = useTeacherUpdate();
   const teachers = data?.data.data;
   const { handlePagination } = useGeneral();
@@ -62,12 +62,12 @@ const Teacher = () => {
 
   const handleModalSubmit = (values: any) => {
     if (selectedTeacher) {
-    updateMutation({ id: selectedTeacher.id, data: values });
-  } else {
-    createMutation(values);
-  }
-  setModalOpen(false);
-  }
+      updateMutation({ id: selectedTeacher.id, data: values });
+    } else {
+      createMutation(values);
+    }
+    setModalOpen(false);
+  };
 
   const columns = [
     {
@@ -147,13 +147,16 @@ const Teacher = () => {
   ];
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={handleCreate}
-        style={{ marginBottom: 16 }}
-      >
-        + Add Teacher
-      </Button>
+      <div className="flex justify-between">
+        <h1>Teachers</h1>
+        <Button
+          type="primary"
+          onClick={handleCreate}
+          style={{ marginBottom: 16 }}
+        >
+          + Add Teacher
+        </Button>
+      </div>
 
       <Table
         dataSource={teachers}

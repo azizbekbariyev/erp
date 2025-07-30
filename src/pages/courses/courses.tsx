@@ -9,13 +9,16 @@ import CourseModal from "./courseModal";
 
 const Course = () => {
   const [params, setParams] = useState({ page: 1, limit: 10 });
-  const { data, isLoading, createCourse, updateCourse, deleteCourse } = useCourse(params);
+  const { data, isLoading, createCourse, updateCourse, deleteCourse } =
+    useCourse(params);
   const { mutate: createMutation, isPending: isCreating } = createCourse();
   const { mutate: updateMutation, isPending: isUpdating } = updateCourse();
   const { mutate: deleteMutation, isPending: isDeleting } = deleteCourse();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CoursesTypes | null>(
+    null
+  );
   const location = useLocation();
   const { handlePagination } = useGeneral();
 
@@ -103,14 +106,17 @@ const Course = () => {
 
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={handleCreate}
-        style={{ marginBottom: 16 }}
-        disabled={isCreating || isUpdating}
-      >
-        + Add Course
-      </Button>
+      <div className="flex justify-between">
+        <h1>Courses</h1>
+        <Button
+          type="primary"
+          onClick={handleCreate}
+          style={{ marginBottom: 16 }}
+          disabled={isCreating || isUpdating}
+        >
+          + Add Course
+        </Button>
+      </div>
 
       <Table
         dataSource={data}
@@ -124,7 +130,8 @@ const Course = () => {
           showSizeChanger: true,
           pageSizeOptions: ["5", "10", "20"],
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} courses`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} courses`,
           position: ["bottomCenter"],
         }}
         onChange={handleTableChange}
