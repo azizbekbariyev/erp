@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Space, Input, Card, Row, Col, message } from "antd";
+import { Table, Button, Space, Card, message } from "antd";
 import {
-  SearchOutlined,
-  ClearOutlined,
+  // SearchOutlined,
+  // ClearOutlined,
   PlusOutlined,
   EditOutlined,
 } from "@ant-design/icons";
@@ -11,12 +11,12 @@ import type { BranchTypes } from "@types";
 import { BranchModal } from "./brancheMadol";
 import { PopConfirm } from "../../components";
 
-const { Search } = Input;
+// const { Search } = Input;
 
 export const Branches = () => {
   const [branches, setBranches] = useState<BranchTypes[]>([]);
   const [filteredBranches, setFilteredBranches] = useState<BranchTypes[]>([]);
-  const [searchText, setSearchText] = useState("");
+  const [searchText] = useState("");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState<BranchTypes | null>(
@@ -110,9 +110,9 @@ export const Branches = () => {
     }
   };
 
-  const clearFilters = () => {
-    setSearchText("");
-  };
+  // const clearFilters = () => {
+  //   setSearchText("");
+  // };
 
   const columns = [
     {

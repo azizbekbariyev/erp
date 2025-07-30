@@ -7,7 +7,7 @@ import GroupTeachers from "../../components/group/teachers";
 const SingleGroup = () => {
   const { id } = useParams<{ id: string }>();
   const { lessons } = useGroup({ page: 1, limit: 10 }, Number(id));
-  const { data: groups, useGroupById } = useGroup({ page: 1, limit: 10 });
+  const { useGroupById } = useGroup({ page: 1, limit: 10 });
   const { teachers } = useGroup({ page: 1, limit: 10 }, Number(id));
   const { students } = useGroup({ page: 1, limit: 10 }, Number(id));
   const { data: group } = useGroupById(Number(id));
