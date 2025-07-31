@@ -2,11 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TeacherSerivce } from "@service/teachers.service";
 import type { ParamsType, TeacherTypes } from "@types";
 
-export const useTeacher = (params:ParamsType) => {
+export const useTeacher = (params?:ParamsType, id?:number) => {
   const queryClinet = useQueryClient();
   const { data, isLoading } = useQuery({
+    enabled: !!id,
     queryKey: ["teacher", params],
-    queryFn: async () => TeacherSerivce.getAllTeacher(params),
+    queryFn: async () => TeacherSerivce.getAllTeacher(params!),
   });
 
   const useTeacherCreate = () => {
@@ -45,9 +46,18 @@ export const useTeacher = (params:ParamsType) => {
     });
   }
 
+  const useGroupTeacher = useQuery({
+    queryKey: ["group-teachers"],
+    queryFn: async () => TeacherSerivce.getTeacherGroups(),
+  })
+
+  const groupTeacher = useGroupTeacher.data
+
+
   return {
     data,
     isLoading,
+    groupTeacher,
     useTeacherCreate,
     useTeacherUpdate,
     useTeacherDelete,

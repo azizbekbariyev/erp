@@ -1,7 +1,7 @@
 // GroupService.ts
 import { apiConfig} from "@api/config";
 import { ApiUrls } from "@api/api-urls";
-import type { GroupTypes } from "@types";
+import type { GroupStudentType, GroupTeacherType, GroupTypes } from "@types";
 import type { ParamsType } from "@types";
 export const GroupService = {
   async fetchGroups(params: ParamsType) {
@@ -55,5 +55,11 @@ export const GroupService = {
     return apiConfig().putRequest(`${ApiUrls.GROUPS}/${groupId}/remove-teacher/${teacherId}`);
   },
 
+  addGroupStudent(model: GroupStudentType){
+    return apiConfig().postRequest(`${ApiUrls.GROUPSTUDENTS}`, model);
+  },
 
+  addGroupTeacher(model: GroupTeacherType){
+    return apiConfig().postRequest(`${ApiUrls.GROUPTEACHERS}`, model);
+  },
 };

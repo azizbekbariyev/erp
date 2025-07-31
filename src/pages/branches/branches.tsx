@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table, Button, Space, Card, message } from "antd";
 import {
-  // SearchOutlined,
-  // ClearOutlined,
   PlusOutlined,
   EditOutlined,
 } from "@ant-design/icons";
@@ -10,8 +8,6 @@ import { useBranch } from "@hooks";
 import type { BranchTypes } from "@types";
 import { BranchModal } from "./brancheMadol";
 import { PopConfirm } from "../../components";
-
-// const { Search } = Input;
 
 export const Branches = () => {
   const [branches, setBranches] = useState<BranchTypes[]>([]);

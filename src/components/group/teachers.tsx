@@ -1,12 +1,55 @@
 import { Button } from "antd";
-import type { GroupTeachersType } from "../../types";
+import type { GroupTeachersType, GroupTeacherType, TeacherTypes } from "../../types";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useGroup, useTeacher } from "../../hooks";
+import AddTeacherModal from "./add-teacher";
 
 const GroupTeachers = ({ teachers }: GroupTeachersType) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const { id: groupId } = useParams();
+  const { useGroupTeacher } = useGroup();
+  const {data} = useTeacher({
+    page: 1,
+    limit: 20,
+  })
+  const allTeachers: TeacherTypes[] = data?.data.data || []
+  const { mutate: createMutate, isPending: isCreating } = useGroupTeacher();
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleSubmit = (values: any) => {
+    const payload: GroupTeacherType = {
+      groupId: Number(groupId),
+      teacherId: values.teacherId.map((id: number) => id.toString()),
+      status: values.status,
+      start_date: values.start_date,
+    };
+
+    console.log("Yuboriladigan payload:", payload);
+    createMutate(payload);
+  };
+
   return (
     <div className="border rounded-lg gap-3 p-4">
       <div className="flex flex-row items-center justify-between">
         <h1 className="text-lg font-semibold">Teachers ({teachers.length})</h1>
-        <Button type="primary">+ Add Teacher</Button>
+        <Button type="primary" onClick={handleOpenModal}>
+          + Add Teacher
+        </Button>
+        <AddTeacherModal
+          open={modalOpen}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmit}
+          loading={isCreating}
+          teachers={allTeachers.map((teacher) => teacher)}
+        />
       </div>
       <div className="flex flex-col gap-2 mt-2">
         {teachers.map((item) => (

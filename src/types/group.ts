@@ -41,3 +41,17 @@ export interface GroupTeachersType {
     teacher: TeacherTypes;
   }[];
 }
+
+export interface GroupStudentType{
+  groupId: string;
+  studentId: []
+  status: boolean
+  start_date:Date
+}
+
+export interface GroupTeacherType{
+  groupId: number;
+  teacherId: []
+  status: boolean
+  start_date:Date
+}

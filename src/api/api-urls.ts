@@ -16,6 +16,7 @@ export class ApiUrls {
 
   //TEACHERS
   public static TEACHER: string = "/teacher";
+  public static TEACHERGROUP: string = "/group-teachers";
 
   //ROOMS
   public static ROOMS: string = "/rooms";
@@ -28,6 +29,9 @@ export class ApiUrls {
 
   //EVENTS
   public static EVENTS: string = "/events";
+
+  //ADMIN
+  public static ADMIN: string = "/admin";
 
   //GROUP LESSONS
   public static GROUPLESSONS: string = this.LESSONS + "/group";

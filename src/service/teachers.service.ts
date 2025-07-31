@@ -17,5 +17,11 @@ export const TeacherSerivce = {
     },
     getTeacherById(id:number){
         return apiConfig().getRequest(`${ApiUrls.TEACHER}/${id}`)
+    },
+    getTeacherGroups(){
+        return apiConfig().getRequest(`${ApiUrls.TEACHERGROUP}/my-groups`)
+    },
+    getStudentGroups(id:number){
+        return apiConfig().getRequest(`${ApiUrls.GROUPS}/${id}/teacher`)
     }
 }

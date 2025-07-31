@@ -20,8 +20,6 @@ const GroupLessons = ({ lessons }: GroupLessonsType) => {
     // setProgress(progress.length)
   }, [lessons])
 
-  console.log(lessons);
-
   return (
     <div className="border rounded-lg gap-6 p-4">
       <div className="flex flex-row items-center justify-between">

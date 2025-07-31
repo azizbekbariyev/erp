@@ -1,8 +1,42 @@
 import { Button, Table, Tag } from "antd";
-import type { GroupStudentsType } from "../../types";
+import type { GroupStudentsType, GroupStudentType, StudentTypes } from "../../types";
 import type { ColumnsType } from "antd/es/table";
+import { useState } from "react";
+import AddStudentModal from "./add-student";
+import { useGroup, useStudent } from "../../hooks";
+import { useParams } from "react-router-dom";
 
 const GroupStudents = ({ students }: GroupStudentsType) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const { id: groupId } = useParams();
+  const { useGroupStudent } = useGroup();
+  const { data } = useStudent({
+    page: 1,
+    limit: 20,
+  });
+  const allStudents: StudentTypes[] = data?.data.data || [];
+  const { mutate: createMutate, isPending: isCreating } = useGroupStudent();
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleSubmit = (values: any) => {
+    const payload: GroupStudentType = {
+      groupId: groupId!,
+      studentId: values.studentId.map((id: number) => id.toString()),
+      status: values.status,
+      start_date: values.start_date,
+    }; 
+
+    console.log("Yuboriladigan payload:", payload);
+    createMutate(payload);
+  };
+
   const columns: ColumnsType<GroupStudentsType["students"][0]> = [
     {
       title: "STUDENTS",
@@ -51,7 +85,16 @@ const GroupStudents = ({ students }: GroupStudentsType) => {
           <span>{students.length}</span>
         </div>
         <div className="flex flex-row gap-4 items-center">
-          <Button type="primary">+ Add student</Button>
+          <Button type="primary" onClick={handleOpenModal}>
+            + Add student
+          </Button>
+          <AddStudentModal
+            open={modalOpen}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmit}
+            loading={isCreating}
+            students={allStudents.map((student) => student)}
+          />
         </div>
       </div>
       <div>

@@ -1,13 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ParamsType, StudentTypes } from "../types";
 import { StudentSerivce } from "@service/student.service";
-export const useStudent = (params: ParamsType) => {
+import { TeacherSerivce } from "../service/teachers.service";
+export const useStudent = (id?: number,params?: ParamsType) => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
+    enabled: !id,
     queryKey: ["students", params],
     queryFn: async () => {
-      const response = await StudentSerivce.getAllStudent(params);
+      const response = await StudentSerivce.getAllStudent(params!);
       return response;
     },
   });
@@ -42,10 +44,19 @@ export const useStudent = (params: ParamsType) => {
       queryFn: async () => StudentSerivce.getStudentById(id),
     });
   };
+
+  const useGroupStudent = useQuery({
+    queryKey: ["group-students"],
+    queryFn: async () => TeacherSerivce.getStudentGroups(id!),
+  });
+
+  const students = useGroupStudent.data;
+
   return {
     data,
     isLoading,
     error,
+    students,
     useStudentCreate,
     useStudentUpdate,
     useStudentDelete,
