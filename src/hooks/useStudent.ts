@@ -46,6 +46,7 @@ export const useStudent = (params?: ParamsType,id?: number) => {
   };
 
   const useGroupStudent = useQuery({
+    enabled: !!id,
     queryKey: ["group-students"],
     queryFn: async () => TeacherSerivce.getStudentGroups(id!),
   });

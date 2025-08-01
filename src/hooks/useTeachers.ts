@@ -5,7 +5,7 @@ import type { ParamsType, TeacherTypes } from "@types";
 export const useTeacher = (params?:ParamsType, id?:number) => {
   const queryClinet = useQueryClient();
   const { data, isLoading } = useQuery({
-    enabled: !!id,
+    enabled: !id,
     queryKey: ["teacher", params],
     queryFn: async () => TeacherSerivce.getAllTeacher(params!),
   });

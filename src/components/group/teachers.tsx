@@ -12,7 +12,7 @@ const GroupTeachers = ({ teachers }: GroupTeachersType) => {
   const {data} = useTeacher({
     page: 1,
     limit: 20,
-  })
+  },)
   const allTeachers: TeacherTypes[] = data?.data.data || []
   const { mutate: createMutate, isPending: isCreating } = useGroupTeacher();
 

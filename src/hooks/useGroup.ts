@@ -5,7 +5,7 @@ import type { ParamsType } from "@types";
 
 export const useGroup = (params?: ParamsType, id?: number) => {
   const queryClinet = useQueryClient();
-  const { data , refetch } = useQuery({
+  const { data, refetch } = useQuery({
     enabled: !id,
     queryKey: ["groups", params],
     queryFn: async () => await GroupService.fetchGroups(params!),
@@ -70,43 +70,45 @@ export const useGroup = (params?: ParamsType, id?: number) => {
 
   const groupStudentQuery = useQuery({
     enabled: !!id,
-    queryKey: ["group-students"],
+    queryKey: ["group-students", id],
     queryFn: async () => GroupService.getGroupStudents(id!),
-  })
-
-  const students = groupStudentQuery.data
+  });
 
   const groupLessonsQuery = useQuery({
     enabled: !!id,
-    queryKey: ["groupLessons"],
+    queryKey: ["group-lessons", id],
     queryFn: async () => GroupService.getGroupLessons(id!),
-  })
-  const lessons = groupLessonsQuery.data
+  });
 
   const groupTeachersQuery = useQuery({
     enabled: !!id,
-    queryKey: ["group-teachers"],
+    queryKey: ["group-teachers", id],
     queryFn: async () => GroupService.getGroupTeachers(id!),
-  })
-  const teachers = groupTeachersQuery.data
+  });
+
+  const students = groupStudentQuery.data;
+  const lessons = groupLessonsQuery.data;
+  const teachers = groupTeachersQuery.data;
 
   const useGroupStudent = () => {
     return useMutation({
-      mutationFn: async (data: GroupStudentType) => GroupService.addGroupStudent(data),
+      mutationFn: async (data: GroupStudentType) =>
+        GroupService.addGroupStudent(data),
       onSuccess: () => {
         queryClinet.invalidateQueries({ queryKey: ["group-students"] });
-      }
-    })
-  }
+      },
+    });
+  };
 
   const useGroupTeacher = () => {
     return useMutation({
-      mutationFn: async (data: GroupTeacherType) => GroupService.addGroupTeacher(data),
+      mutationFn: async (data: GroupTeacherType) =>
+        GroupService.addGroupTeacher(data),
       onSuccess: () => {
         queryClinet.invalidateQueries({ queryKey: ["group-teachers"] });
-      }
-    })
-  }
+      },
+    });
+  };
 
   return {
     data,
@@ -121,6 +123,6 @@ export const useGroup = (params?: ParamsType, id?: number) => {
     useGroupAddStudent,
     useGroupAddTeacher,
     useGroupStudent,
-    useGroupTeacher
+    useGroupTeacher,
   };
 };

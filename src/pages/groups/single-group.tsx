@@ -6,11 +6,10 @@ import GroupTeachers from "../../components/group/teachers";
 
 const SingleGroup = () => {
   const { id } = useParams<{ id: string }>();
-  const { lessons } = useGroup({ page: 1, limit: 10 }, Number(id));
+  const { teachers, students, lessons } = useGroup({ page: 1, limit: 10 }, Number(id));
   const { useGroupById } = useGroup({ page: 1, limit: 10 });
-  const { teachers } = useGroup({ page: 1, limit: 10 }, Number(id));
-  const { students } = useGroup({ page: 1, limit: 10 }, Number(id));
   const { data: group } = useGroupById(Number(id));
+  console.log(teachers?.data?.length);
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col justify-center p-4 rounded-lg border gap-3">
