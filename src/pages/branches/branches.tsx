@@ -43,8 +43,7 @@ export const Branches = () => {
         branchData.data ||
         [];
 
-      console.log("Extracted branches:", branchesData);
-
+        createMutation(branchesData);
       if (Array.isArray(branchesData)) {
         setBranches(branchesData);
       } else {
