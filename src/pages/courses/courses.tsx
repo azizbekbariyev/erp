@@ -82,19 +82,31 @@ const Course = () => {
       title: "Status",
       dataIndex: "is_active",
       key: "is_active",
-      render: (val: boolean) => (val ? "✅ Ha" : "❌ Yo'q"),
+      render: (val: boolean) =>
+        val ? (
+          <span style={{ color: "green", fontWeight: "bold" }}>Active</span>
+        ) : (
+          <span style={{ color: "red", fontWeight: "bold" }}>Inactive</span>
+        ),
     },
     {
       title: "Actions",
       key: "actions",
       render: (_: any, record: CoursesTypes) => (
         <Space>
-          <Button
+          {/* <Button
             type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
             disabled={isUpdating || isCreating}
-          />
+          /> */}
+          <Button
+            type="primary"
+            onClick={() => handleUpdate(record)}
+            disabled={isUpdating || isCreating}
+          >
+            <EditOutlined />
+          </Button>
           <PopConfirm
             handleDelete={() => handleDelete(record.id)}
             loading={isDeleting}

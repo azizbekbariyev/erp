@@ -16,7 +16,8 @@ const Groups = () => {
     useGroupDelete,
   } = useGroup({ limit: 10, page: 1 });
   const { data: courses } = useCourse({ limit: 100, page: 1 });
-  const {mutate: deleteMutation, isPending: isDeletePending} = useGroupDelete();
+  const { mutate: deleteMutation, isPending: isDeletePending } =
+    useGroupDelete();
   const [modalOpen, setModalOpen] = useState(false);
   // const [selectedGroup, setSelectedGroup] = useState(null);
   const [update, setUpdate] = useState<GroupTypes | null>(null);
@@ -44,7 +45,7 @@ const Groups = () => {
       },
     });
   };
-const editItem = (record: GroupTypes) => {
+  const editItem = (record: GroupTypes) => {
     setUpdate(record);
     setModalOpen(true);
   };

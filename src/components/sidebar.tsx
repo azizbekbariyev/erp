@@ -54,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   ];
 
   return (
-    <div className="fixed" style={{ width: collapsed ? 80 : 250, transition: "width 0.1s ease", top: 72 }}>
+    <div style={{ width: collapsed ? 80 : 250, transition: "width 0.1s ease", top: 72 }}>
       <Menu
         selectedKeys={[location.pathname]}
         mode="inline"
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         items={items}
         className="custom-menu"
         style={{
-          height: "1000px",
+          height: "100%",
           borderRight: 0,
           background: "linear-gradient(180deg, #001529 0%, #002140 100%)",
         }}

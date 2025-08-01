@@ -10,9 +10,10 @@ const Students = () => {
   const [students, setStudents] = useState<StudentTypes[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [update, setUpdate] = useState<StudentTypes | null>(null);
+  const [page, setPage] = useState(1); // 👈 Sahifa holati
 
   const { data, useStudentCreate, useStudentDelete, useStudentUpdate } = useStudent({
-    page: 1,
+    page,
     limit: 10,
   });
 
@@ -49,17 +50,15 @@ const Students = () => {
 
   const handleSubmit = (values: any) => {
     if (update) {
-      console.log("Update",values);
       updateMutation(
         { id: update.id, data: values },
         {
           onSuccess: () => {
             handleCloseModal();
-          },  
+          },
         }
       );
     } else {
-      console.log("Create",values);
       createMutation(values, {
         onSuccess: () => {
           handleCloseModal();
@@ -71,7 +70,7 @@ const Students = () => {
   const columns = [
     {
       title: "ID",
-      render: (_: any, __: any, index: number) => index + 1,
+      render: (_: any, __: any, index: number) => (page - 1) * 10 + index + 1,
     },
     {
       title: "First Name",
@@ -119,15 +118,12 @@ const Students = () => {
       title: "Actions",
       render: (_: any, record: StudentTypes) => (
         <Space>
-          <Button
-          type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleUpdate(record)}
-            disabled={isUpdating}
-          />
+          <Button type="primary" onClick={() => handleUpdate(record)}>
+            <EditOutlined />
+          </Button>
           <PopConfirm
             handleDelete={() => handleDelete(record.id)}
-            loading={ isDeleting }
+            loading={isDeleting}
           />
         </Space>
       ),
@@ -136,7 +132,7 @@ const Students = () => {
 
   return (
     <div>
-      <div className="flex justify-between" style={{ marginBottom: 16 }}>
+      <div className="flex justify-between mb-4">
         <h1>Students</h1>
         <Button
           type="primary"
@@ -151,8 +147,15 @@ const Students = () => {
         columns={columns}
         dataSource={students || []}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
+        pagination={{
+          current: page,
+          pageSize: 10,
+          total: data?.data.total || 0, // ✅ Backend total qiymatini qaytaryaptimi, tekshiring
+        }}
         loading={isCreating || isUpdating || isDeleting}
+        onChange={(pagination) => {
+          setPage(pagination.current || 1); // 👈 Sahifani yangilash
+        }}
       />
 
       <StudentModal

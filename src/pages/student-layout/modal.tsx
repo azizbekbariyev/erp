@@ -116,7 +116,7 @@ const StudentModal = ({
               <Input.Password disabled={loading} placeholder="Enter password" />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               label="Confirm Password"
               name="confirm_password"
               dependencies={["password_hash"]}
@@ -136,7 +136,7 @@ const StudentModal = ({
                 disabled={loading}
                 placeholder="Confirm password"
               />
-            </Form.Item>
+            </Form.Item> */}
           </>
         )}
 

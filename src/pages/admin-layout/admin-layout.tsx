@@ -12,11 +12,11 @@ export const AdminLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header onToggle={toggleCollapsed} collapsed={collapsed} />{" "}
+      <Header onToggle={toggleCollapsed} collapsed={collapsed} />
       {/* Prop beriladi */}
       <div className="flex flex-1">
         <Sidebar collapsed={collapsed} /> {/* Sidebar ham prop oladi */}
-        <main className="flex-1 p-4 overflow-y-auto bg-gray-100 ml-20 mt-20">
+        <main className="flex-1 p-4 bg-gray-50">
           <Outlet />
         </main>
       </div>

@@ -83,12 +83,15 @@ const Room = () => {
       title: "Action",
       render: (_: any, record: RoomTypes) => (
         <Space>
-          <Button
+          {/* <Button
             type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
             disabled={isUpdating}
-          />
+          /> */}
+          <Button type="primary" disabled={isUpdating} onClick={() => handleUpdate(record)}>
+            <EditOutlined/>
+          </Button>
           <PopConfirm
             handleDelete={() => handleDelete(record.id)}
             loading={isDeleting}

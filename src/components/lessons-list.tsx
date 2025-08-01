@@ -78,7 +78,7 @@ const LessonsList = ({ lessons }: GroupLessonsType) => {
           const bgColor = getBgColor(lesson.status);
           const shapeClass =
             lesson.status === "completed" ? "rounded-none" : "rounded-lg";
-
+          
           return (
             <div
               key={lesson.id}

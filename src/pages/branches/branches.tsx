@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table, Button, Space, Card, message } from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { useBranch } from "@hooks";
 import type { BranchTypes } from "@types";
 import { BranchModal } from "./brancheMadol";
@@ -34,8 +31,6 @@ export const Branches = () => {
     useBranchDelete();
 
   useEffect(() => {
-    console.log("Branch data received:", branchData);
-
     if (branchData && branchData.data) {
       const branchesData =
         branchData.data.data?.branch ||
@@ -43,15 +38,12 @@ export const Branches = () => {
         branchData.data ||
         [];
 
-        createMutation(branchesData);
       if (Array.isArray(branchesData)) {
         setBranches(branchesData);
       } else {
-        console.log("Branches data is not array:", branchesData);
         setBranches([]);
       }
     } else {
-      console.log("No branch data, setting empty array");
       setBranches([]);
     }
   }, [branchData]);
@@ -101,7 +93,13 @@ export const Branches = () => {
     if (selectedBranch) {
       updateMutation({ id: selectedBranch.id, data: values });
     } else {
-      createMutation(values);
+      createMutation(values, {
+        onSuccess: () => setModalOpen(false),
+        onError: (error) => {
+          message.error("Xatolik yuz berdi");
+          console.error("Xatolik:", error);
+        },
+      });
     }
   };
 
@@ -148,11 +146,9 @@ export const Branches = () => {
       title: "Actions",
       render: (_: any, record: BranchTypes) => (
         <Space>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleUpdate(record)}
-          />
+          <Button type="primary" onClick={() => handleUpdate(record)}>
+            <EditOutlined />
+          </Button>
           <PopConfirm
             handleDelete={() => handleDelete(record)}
             loading={isDeletePending}

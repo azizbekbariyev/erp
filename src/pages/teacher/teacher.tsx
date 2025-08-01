@@ -104,7 +104,7 @@ const Teacher = () => {
       title: "Status",
       dataIndex: "is_active",
       key: "is_active",
-      render: (value: boolean) => (value ? "✅ Ha" : "❌ Yo'q"),
+      render: (value: boolean) => (value ? <span style={{ color: "green", fontWeight: "bold" }}>Active</span> : <span style={{ color: "red", fontWeight: "bold" }}>Inactive</span>),
     },
     {
       title: "Rasm",
@@ -131,12 +131,15 @@ const Teacher = () => {
       title: "Actions",
       render: (_: any, record: TeacherTypes) => (
         <Space>
-          <Button
+          {/* <Button
             type="primary"
             icon={<EditOutlined />}
             onClick={() => handleUpdate(record)}
             disabled={isUpdating}
-          />
+          /> */}
+          <Button type="primary" disabled={isUpdating} onClick={() => handleUpdate(record)}>
+            <EditOutlined/>
+          </Button>
           <PopConfirm
             handleDelete={() => handleDelete(record.id)}
             loading={isDeleting}

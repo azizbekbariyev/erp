@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({
     window.location.href = '/';
   };
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-800 text-white p-4 shadow-lg">
+    <header className="bg-slate-800 text-white p-4 shadow-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Sidebar Toggle Button */}

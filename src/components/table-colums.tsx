@@ -27,6 +27,7 @@ export const GroupColumns:TableProps<GroupTypes>["columns"] = [
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (value: boolean) => (value ? <span style={{ color: "green", fontWeight: "bold" }}>Active</span> : <span style={{ color: "red", fontWeight: "bold" }}>Inactive</span>),
     },
 ]
 

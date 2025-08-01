@@ -15,7 +15,7 @@ const TeacherLayout = () => {
       <Header onToggle={toggleCollapsed} collapsed={collapsed} />
       <div className="flex flex-1">
         <Sidebar collapsed={collapsed} />
-        <main className="flex-1 p-4 bg-gray-50"> {/* Fixed: added proper styling */}
+        <main className="flex-1 p-4 bg-gray-50">
           <Outlet />
         </main>
       </div>
