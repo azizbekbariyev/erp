@@ -1,6 +1,7 @@
 import React from 'react';
 import { LogOut, User, Menu, X } from 'lucide-react';
 import { GetItem } from '@helper/storages';
+import { useNavigate } from 'react-router-dom';
 
 type HeaderProps = {
   title?: string;
@@ -15,6 +16,7 @@ const Header: React.FC<HeaderProps> = ({
   collapsed, 
   onToggle 
 }) => {
+  const navigate = useNavigate()
   const handleLogout = () => {
     // Logout logic
     localStorage.removeItem('access_token');
@@ -55,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center space-x-3">
             {GetItem('access_token') ? (
               <>
-                <div className="flex items-center space-x-2 text-sm">
+                <div onClick={()=>navigate('/admin/profile')} className="cursor-pointer flex items-center space-x-2 text-sm">
                   <User size={16} />
                   <span>Admin</span>
                 </div>

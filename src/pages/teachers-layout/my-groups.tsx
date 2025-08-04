@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Search, Users, BookOpen, Calendar } from "lucide-react";
-import { useTeacher } from "../../hooks";
 import { TeacherSerivce } from "../../service/teachers.service";
 import { useNavigate } from "react-router-dom";
+import { useTeacherLayOut } from "../../hooks/useTeacherLayOut";
 
 const MyGroup = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,15 +32,15 @@ const MyGroup = () => {
     return "bg-orange-500";
   };
 
-  const { groupTeacher } = useTeacher();
+  const { groupTeacher } = useTeacherLayOut();
   const [studentsData, setStudentsData] = useState<any[]>([]);
 
-//   const [loading, setLoading] = useState(false);
+  //   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
       if (!groupTeacher?.data) return;
-    //   setLoading(true);
+      //   setLoading(true);
       try {
         const allStudents = await Promise.all(
           groupTeacher.data.map(async (group: any) => {
@@ -49,15 +49,12 @@ const MyGroup = () => {
           })
         );
         setStudentsData(allStudents.flat());
-      } catch (err) {
-        console.error("Error fetching students", err);
-      } finally {
-        // setLoading(false);
-      }
+      } catch (error) {}
     };
 
     fetchStudents();
   }, [groupTeacher]);
+  console.log(groupTeacher);
 
   const [activeGroup, setActiveGroups] = useState(0);
   const [activeStudents, setActiveStudents] = useState(0);
@@ -81,6 +78,10 @@ const MyGroup = () => {
     setActiveGroups(activeGroups);
     setCompletedGroup(finishGroup);
     setActiveStudents(allStudents);
+    console.log(studentsData);
+    console.log(allStudents);
+    console.log(activeGroups);
+    console.log(finishGroup);
   }, [studentsData]);
 
   return (
@@ -207,12 +208,18 @@ const MyGroup = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {studentsData.map((group) => (
-                  <tr key={group.id} className="hover:cursor-pointer" onClick={()=>navigate(`/teacher/my-groups/${group.group.id}`)}>
+                  <tr
+                    key={group.id}
+                    className="hover:cursor-pointer"
+                    onClick={() =>
+                      navigate(`/teacher/my-groups/${group.group.id}`)
+                    }
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
                           {group.group.course.title}
-                        </div>  
+                        </div>
                         <div className="text-sm text-gray-500">
                           {group.group.course.description}
                         </div>

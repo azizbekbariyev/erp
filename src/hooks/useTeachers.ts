@@ -46,18 +46,10 @@ export const useTeacher = (params?:ParamsType, id?:number) => {
     });
   }
 
-  const useGroupTeacher = useQuery({
-    queryKey: ["group-teachers"],
-    queryFn: async () => TeacherSerivce.getTeacherGroups(),
-  })
-
-  const groupTeacher = useGroupTeacher.data
-
 
   return {
     data,
     isLoading,
-    groupTeacher,
     useTeacherCreate,
     useTeacherUpdate,
     useTeacherDelete,

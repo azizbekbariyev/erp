@@ -69,7 +69,7 @@ const LessonsList = ({ lessons }: GroupLessonsType) => {
         Prev
       </Button>
       <div
-        className="overflow-x-scroll flex gap-2 [&::-webkit-scrollbar]:hidden"
+        className="overflow-hidden flex gap-2 [&::-webkit-scrollbar]:hidden"
         ref={containerRef}
         onScroll={handelScroll}
         style={{ scrollSnapType: "x mandatory" }}
@@ -78,7 +78,7 @@ const LessonsList = ({ lessons }: GroupLessonsType) => {
           const bgColor = getBgColor(lesson.status);
           const shapeClass =
             lesson.status === "completed" ? "rounded-none" : "rounded-lg";
-          
+
           return (
             <div
               key={lesson.id}
@@ -104,8 +104,12 @@ const LessonsList = ({ lessons }: GroupLessonsType) => {
       >
         {selectedLesson && (
           <div className="space-y-2">
-            <div><strong>ID:</strong> {selectedLesson.id}</div>
-            <div><strong>Status:</strong> {selectedLesson.status}</div>
+            <div>
+              <strong>ID:</strong> {selectedLesson.id}
+            </div>
+            <div>
+              <strong>Status:</strong> {selectedLesson.status}
+            </div>
             {/* Qo‘shimcha maydonlar shu yerga */}
           </div>
         )}

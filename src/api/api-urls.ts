@@ -43,4 +43,13 @@ export class ApiUrls {
   //GROUP STUDENTS
   public static GROUPSTUDENTS: string = "/group-students"; 
   public static GROUPSTUDENTSBYGROUPID: string = this.GROUPSTUDENTS + '/by-group';
+
+  //FORGET PASSWORD
+  public static FORGETPASSWORD: string = "/admin/forget-password";
+
+  //OTP
+  public static CONFIRMOTP: string = "/admin/verify-otp";
+
+  //RESET PASSWORD
+  public static RESETPASSWORD: string = "/admin/new-password";
 }

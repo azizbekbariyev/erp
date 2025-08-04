@@ -2,7 +2,7 @@
 
 import { useNavigate } from "react-router-dom";
 import type { PaginationConfig } from "@types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Service } from "../service/general.service";
 
 export const useGeneral = () => {
@@ -31,10 +31,41 @@ export const useGeneral = () => {
   })
 
   const data = information.data?.data;
+
+  const forgetPassword = () => {
+    return useMutation({
+      mutationFn: async (data: any) => Service.forgetPassword(data),
+      onSuccess: () => {
+        navigate("/verify-code-page")
+      }
+    })
+  }
+
+  const confirmOtp = () => {
+    return useMutation({
+      mutationFn: async (data: any) => Service.confirmOtp(data),
+      onSuccess: ()=>{
+        navigate("/reset-password")
+      }
+    })
+  }
+
+  const confirmPassword = () => {
+    return useMutation({
+      mutationFn: async (data: any) => Service.confirmPassword(data),
+      onSuccess: () => {
+        navigate("/")
+      }
+    })
+  }
   
   return {
     data,
+    information,
     handlePagination,
+    forgetPassword,
+    confirmPassword,
+    confirmOtp,
   };
 };
 
